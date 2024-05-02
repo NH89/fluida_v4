@@ -506,7 +506,7 @@ void FluidSystem::InsertParticlesCL(uint* gcell, uint* gndx, uint* gcnt) { //bin
             cout << "Index: " << i << ", Value: " << bufI(&m_Fluid, FBIN_OFFSET)[i] << endl;
         }
     }*/
-
+/*
 //     clEnqueueReadBuffer(m_queue, gpuVar(&m_Fluid, FPOS), CL_TRUE, 0, mMaxPoints*sizeof(cl_float3), bufV3(&m_Fluid, FPOS), 0, NULL, NULL);
 //
 //
@@ -517,7 +517,7 @@ void FluidSystem::InsertParticlesCL(uint* gcell, uint* gndx, uint* gcnt) { //bin
 //     }
 //     fflush(stdout);
 //
-
+*/
 
     clFlush(m_queue);
     clFinish(m_queue);
@@ -531,7 +531,7 @@ void FluidSystem::InsertParticlesCL(uint* gcell, uint* gndx, uint* gcnt) { //bin
             clSetKernelArg(m_Kern[FUNC_FPREFIXSUM], 0, sizeof(cl_mem), &array1);
             clSetKernelArg(m_Kern[FUNC_FPREFIXSUM], 1, sizeof(cl_mem), &scan1);
             clSetKernelArg(m_Kern[FUNC_FPREFIXSUM], 2, sizeof(cl_mem), &array2);
-            clSetKernelArg(m_Kern[FUNC_FPREFIXSUM], 3, sizeof(size_t), &allElements);
+            clSetKernelArg(m_Kern[FUNC_FPREFIXSUM], 3, sizeof(int), &t_numElem1); // size_t  allElements
             clSetKernelArg(m_Kern[FUNC_FPREFIXSUM], 4, sizeof(int), &zero_offsets);
 
 
@@ -552,6 +552,7 @@ void FluidSystem::InsertParticlesCL(uint* gcell, uint* gndx, uint* gcnt) { //bin
     clFlush(m_queue);
     clFinish(m_queue);
 
+    /// TODO    insert if(...) here , wrapping 2nd & 3rd preficsum(..) calls .
 
             clSetKernelArg(m_Kern[FUNC_FPREFIXSUM], 0, sizeof(cl_mem), &array2);
             clSetKernelArg(m_Kern[FUNC_FPREFIXSUM], 1, sizeof(cl_mem), &scan2);
@@ -572,7 +573,7 @@ void FluidSystem::InsertParticlesCL(uint* gcell, uint* gndx, uint* gcnt) { //bin
         NULL),
     "PrefixSumCellsCL", "clEnqueueNDRangeKernel", "FUNC_FPREFIXSUM 1.2", mbDebug);
 
-
+/*
 //     clFlush(m_queue);
 //     clFinish(m_queue);
 //
@@ -599,7 +600,7 @@ void FluidSystem::InsertParticlesCL(uint* gcell, uint* gndx, uint* gcnt) { //bin
 //
 //     // Close the file
 //     outputFile.close();
-
+*/
     clFlush(m_queue);
     clFinish(m_queue);
 
@@ -659,13 +660,17 @@ void FluidSystem::InsertParticlesCL(uint* gcell, uint* gndx, uint* gcnt) { //bin
     //void* argsE[3] = { &scan1, &scan2, &numElem1 };		                        // merge scan2 into scan1. output -> scan1      i.e. FAUXSCAN1, FBIN_OFFSET -> FBIN_OFFSET
             clSetKernelArg(m_Kern[FUNC_FPREFIXUP], 0, sizeof(cl_mem), &scan1);
             clSetKernelArg(m_Kern[FUNC_FPREFIXUP], 1, sizeof(cl_mem), &scan2);
-            clSetKernelArg(m_Kern[FUNC_FPREFIXUP], 2, sizeof(int), &allElements);
+            clSetKernelArg(m_Kern[FUNC_FPREFIXUP], 2, sizeof(int), &t_numElem1);    //allElements
 
-    //clCheck ( clLaunchKernel ( m_Kern[FUNC_FPREFIXUP], numItemsPerGroup, 1, 1, threads, 1, 1, 0, NULL, argsE, NULL ), "PrefixSumCellsCL", "cuLaunch", "FUNC_PREFIXFIXUP", mbDebug);
+            // TODO end of if(..) block for 2nd & 3rd prefixsum(..) calls
+
+
 /*
-    cout << "\n+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+# globalNumThreads = " << globalNumThreads << flush;          //allElements = 10000 = m_GridTotal
-    cout << "\n+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+# t_blockSize2 = " << t_blockSize2 << flush;          //allElements = 10000 = m_GridTotal*/
+    //clCheck ( clLaunchKernel ( m_Kern[FUNC_FPREFIXUP], numItemsPerGroup, 1, 1, threads, 1, 1, 0, NULL, argsE, NULL ), "PrefixSumCellsCL", "cuLaunch", "FUNC_PREFIXFIXUP", mbDebug);
 
+    cout << "\n+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+# globalNumThreads = " << globalNumThreads << flush;          //allElements = 10000 = m_GridTotal
+    cout << "\n+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+#+# t_blockSize2 = " << t_blockSize2 << flush;          //allElements = 10000 = m_GridTotal
+*/
     clCheck(clEnqueueNDRangeKernel( //----------------------------------------------FUNC_FPREFIXUP
 
 
@@ -683,7 +688,7 @@ void FluidSystem::InsertParticlesCL(uint* gcell, uint* gndx, uint* gcnt) { //bin
 
     clFlush(m_queue);
     clFinish(m_queue);
-
+/*
 //     clEnqueueReadBuffer(m_queue, gpuVar(&m_Fluid, FBIN_OFFSET), CL_TRUE, 0, (m_GridTotal-1)*sizeof(int), bufI(&m_Fluid, FBIN_OFFSET), 0, NULL, NULL);
 //
 //     cout << "\n############################################################################################### FBIN_OFFSET A F T E R  PrefixSumCellsCL():\n";
@@ -692,7 +697,7 @@ void FluidSystem::InsertParticlesCL(uint* gcell, uint* gndx, uint* gcnt) { //bin
 //             cout << "Index: " << i << ", Value: " << bufI(&m_Fluid, FBIN_OFFSET)[i] << endl;
 //         }
 //     }
-
+*/
     clEnqueueReadBuffer(m_queue, gpuVar(&m_Fluid, FPOS), CL_TRUE, 0, mMaxPoints*sizeof(cl_float3), bufV3(&m_Fluid, FPOS), 0, NULL, NULL);
 
     clFlush(m_queue);
@@ -713,7 +718,8 @@ void FluidSystem::InsertParticlesCL(uint* gcell, uint* gndx, uint* gcnt) { //bin
     // For each gene, input FBIN_COUNT_ACTIVE_GENES[gene*m_GridTotal], output FBIN_OFFSET_ACTIVE_GENES[gene*m_GridTotal]
     cl_mem array0 = gpuVar(&m_Fluid,FBIN_COUNT_ACTIVE_GENES);
     cl_mem scan0 = gpuVar(&m_Fluid,FBIN_OFFSET_ACTIVE_GENES);
-    /*cout << "\n____\n\n";
+    /*
+    cout << "\n____\n\n";
 
     for (int gene = 0; gene < NUM_GENES; gene++) {
     size_t offset_array0 = gene * t_numElem1 * sizeof(int);
@@ -783,7 +789,7 @@ void FluidSystem::InsertParticlesCL(uint* gcell, uint* gndx, uint* gcnt) { //bin
         // input FBIN_COUNT_ACTIVE_GENES[gene*m_GridTotal],
         // output FBIN_OFFSET_ACTIVE_GENES[gene*m_GridTotal]
 
-    /*
+
 
             //         void* argsA[5] = {&array1,&scan1,&array2,&allElements,&zero_offsets};
                     clCheck(clEnqueueNDRangeKernel(m_queue,m_Kern[FUNC_FPREFIXSUM],1,NULL,numItemsPerGroup,threads,0,NULL,NULL),"PrefixSumCellsCL","clEnqueueNDRangeKernel","FUNC_PREFIXSUM",mbDebug);
@@ -802,7 +808,8 @@ void FluidSystem::InsertParticlesCL(uint* gcell, uint* gndx, uint* gcnt) { //bin
 
             //         void* argsE[3] = {&scan1,&scan2,&allElements};
                     //clCheck(clEnqueueNDRangeKernel(m_queue,m_Kern[FUNC_FPREFIXUP],1,NULL,numItemsPerGroup,threads,0,NULL,NULL),"PrefixSumCellsCL","clEnqueueNDRangeKernel","FUNC_PREFIXFIXUP",mbDebug);
-    }*/
+    }
+*/
 /*
     printf("\nPhase 3 done.\n");
 
@@ -839,7 +846,7 @@ void FluidSystem::InsertParticlesCL(uint* gcell, uint* gndx, uint* gcnt) { //bin
     }
 
     clCheck(clEnqueueWriteBuffer(m_queue, gpuVar(&m_Fluid, FDENSE_LISTS), CL_TRUE, 0, NUM_GENES * sizeof(cl_mem), bufC(&m_Fluid, FDENSE_LISTS), 0, NULL, NULL), "PrefixSumCellsCL", "clEnqueueWriteBuffer", "FDENSE_LISTS", mbDebug);
-    clCheck(clEnqueueWriteBuffer(m_queue, gpuVar(&m_Fluid, FDENSE_BUF_LENGTHS), CL_TRUE, 0, NUM_GENES * sizeof(cl_mem), bufC(&m_Fluid, FDENSE_BUF_LENGTHS), 0, NULL, NULL), "PrefixSumCellsCL", "clEnqueueWriteBuffer", "FDENSE_BUF_LENGTHS", mbDebug);*/
+    clCheck(clEnqueueWriteBuffer(m_queue, gpuVar(&m_Fluid, FDENSE_BUF_LENGTHS), CL_TRUE, 0, NUM_GENES * sizeof(cl_mem), bufC(&m_Fluid, FDENSE_BUF_LENGTHS), 0, NULL, NULL), "PrefixSumCellsCL", "clEnqueueWriteBuffer", "FDENSE_BUF_LENGTHS", mbDebug);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //if (verbosity > 1) {                                                                                                      //
@@ -849,7 +856,7 @@ void FluidSystem::InsertParticlesCL(uint* gcell, uint* gndx, uint* gcnt) { //bin
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //}
     //}
-
+*/
     if (verbosity>1) printf("\n-----PrefixSumCellsCL() finished-----\n");
 
 }
@@ -1054,7 +1061,7 @@ void FluidSystem::PrefixSumChangesCL ( int zero_offsets ){
 }
 
 void FluidSystem::CountingSortFullCL ( cl_float3* ppos ){
-    if (verbosity>1) std::cout << "\n-----CountingSortFullCL() started... -----\nCountingSortFullCL()1: mMaxPoints="<<mMaxPoints<<", mNumPoints="<<mNumPoints<<",\nmActivePoints="<<mActivePoints<<".\n"<<std::flush;
+    if (verbosity>-1) std::cout << "\n-----CountingSortFullCL() started... -----\tCountingSortFullCL()1: mMaxPoints="<<mMaxPoints<<", mNumPoints="<<mNumPoints<<",\tmActivePoints="<<mActivePoints<<".\n"<<std::flush;
 
     // get number of active particles & set short lists for later kernels
     int grid_ScanMax = (m_FParams.gridScanMax.y * m_FParams.gridRes.z + m_FParams.gridScanMax.z) * m_FParams.gridRes.x + m_FParams.gridScanMax.x;
@@ -1071,7 +1078,7 @@ void FluidSystem::CountingSortFullCL ( cl_float3* ppos ){
         clCheck(
             clEnqueueReadBuffer(m_queue, gpuVar(&m_Fluid, FBIN_OFFSET), CL_TRUE, grid_ScanMax*sizeof(int), sizeof(int), &mActivePoints, 0, NULL, NULL), "CountingSortFullCL2", "clEnqueueReadBuffer", "FBIN_OFFSET", mbDebug);
 
-    if (verbosity>1) std::cout<<"\nCountingSortFullCL()2: mMaxPoints="<<mMaxPoints<<" mNumPoints="<<mNumPoints<<",\tmActivePoints="<<mActivePoints<<",  m_GridTotal="<<m_GridTotal<<", grid_ScanMax="<<grid_ScanMax<<"\n"<<std::flush;
+    if (verbosity>-1) std::cout<<"\nCountingSortFullCL()2: mMaxPoints="<<mMaxPoints<<" mNumPoints="<<mNumPoints<<",\tmActivePoints="<<mActivePoints<<",  m_GridTotal="<<m_GridTotal<<", grid_ScanMax="<<grid_ScanMax<<"\n"<<std::flush;
 
     clFlush (m_queue);
     clFinish (m_queue);
@@ -1218,8 +1225,10 @@ void FluidSystem::CountingSortFullCL ( cl_float3* ppos ){
     //Calculate the work group sizes
     computeNumBlocks ( mMaxPoints, local_work_size, m_FParams.numGroups, m_FParams.numItems); // particles
 
-    std::cout << "m_FParams.numGroups: " << m_FParams.numGroups << std::endl;
-    std::cout << "m_FParams.numItems: " << m_FParams.numItems << std::endl;
+    std::cout << "\nFUNC_COUNTING_SORT_FULL  mMaxPoints: "          << mMaxPoints          << std::flush;
+    std::cout << "\nFUNC_COUNTING_SORT_FULL local_work_size: "      << local_work_size     << std::flush;
+    std::cout << "\nFUNC_COUNTING_SORT_FULL  m_FParams.numGroups: " << m_FParams.numGroups << std::flush;
+    std::cout << "\nFUNC_COUNTING_SORT_FULL  m_FParams.numItems: "  << m_FParams.numItems  << std::flush;
 
     cl_int status;
 
@@ -1329,6 +1338,12 @@ void FluidSystem::CountingSortFullCL ( cl_float3* ppos ){
     clFinish (m_queue);
 
     computeNumBlocks ( m_FParams.pnumActive, local_work_size, m_FParams.numGroups, m_FParams.numItems); // particles
+
+    std::cout << "\nFUNC_COUNT_SORT_DENSE_LISTS  m_FParams.pnumActive: " <<  m_FParams.pnumActive   << std::flush;
+    std::cout << "\nFUNC_COUNT_SORT_DENSE_LISTS  local_work_size: "      << local_work_size         << std::flush;
+    std::cout << "\nFUNC_COUNT_SORT_DENSE_LISTS  m_FParams.numGroups: "  << m_FParams.numGroups     << std::flush;
+    std::cout << "\nFUNC_COUNT_SORT_DENSE_LISTS  m_FParams.numItems: "   << m_FParams.numItems      << std::flush;
+
 
     if (verbosity>1) std::cout<<"\n CountingSortDenseListsCL : FUNC_COUNT_SORT_DENSE_LISTS\n"<<std::flush;
     // countingSortDenseLists ( int pnum ) // NB launch on bins not particles.
@@ -1945,6 +1960,7 @@ void FluidSystem::InitializeBondsCL (){
 }
 
 void FluidSystem::ComputePressureCL (){
+    cout <<"\nFluidSystem::ComputePressureCL () : chk 1 "<< flush;
     cl_int status;
     //void* args[1] = { &mActivePoints };
     status  = clSetKernelArg(m_Kern[FUNC_COMPUTE_PRESS], 0, sizeof(int), &mActivePoints);
@@ -1952,9 +1968,13 @@ void FluidSystem::ComputePressureCL (){
     size_t global_work_size = m_FParams.numGroups * m_FParams.numItems;
     size_t local_work_size = m_FParams.numItems;
 
+    cout <<"\nFluidSystem::ComputePressureCL () : chk 2  global_work_size = " <<global_work_size<<",  local_work_size =  " << global_work_size << ", m_FParams.numGroups = "<<m_FParams.numGroups<<" , m_FParams.numItems = "<< m_FParams.numItems << flush;
+
     //cout<<"\nComputePressureCL: mActivePoints="<<mActivePoints<<std::flush;
     //clCheck ( cuLaunchKernel ( m_Kern[FUNC_COMPUTE_PRESS],  m_FParams.numGroups, 1, 1, m_FParams.numItems, 1, 1, 0, NULL, args, NULL), "ComputePressureCL", "cuLaunch", "FUNC_COMPUTE_PRESS", mbDebug);
     status = clEnqueueNDRangeKernel(m_queue, m_Kern[FUNC_COMPUTE_PRESS], 1, NULL, &global_work_size, &local_work_size, 0, NULL, NULL);
+
+    cout <<"\nFluidSystem::ComputePressureCL () : finished "<< flush;
 }
 
 void FluidSystem::ComputeDiffusionCL(){

@@ -61,7 +61,7 @@ int main ( int argc, const char** argv )
 
 
     if ((argc != 2) && (argc !=1)) {
-        printf ( "usage: make_demo2 input_folder output_folder.\
+        printf ( "usage: create_demo2 config.json .\
         \nNB input_folder must contain \"SpecificationFile.txt\", output will be wrtitten to \"output_folder/out_data_time/\".\
         \nIf output_folder is not given the value from SpecificationFile.txt will be used.\n" );
         return 0;

@@ -1942,20 +1942,21 @@ void FluidSystem::Run2PhysicalSort(){ // beginning of every time step, sorrting 
 }
 
 void FluidSystem::Run2InnerPhysicalLoop(){ //
+    cout << "\n####\n------- starting Run2InnerPhysicalLoop()... -------" << flush;
     printf("\n####\n------- starting Run2InnerPhysicalLoop()... -------");//     if(m_FParams.freeze==true){
 //         InitializeBondsCL ();
 //         clCheck(clFinish(m_queue), "Run", "clFinish", "After InitializeBondsCL ", mbDebug);
 //     }
     printf("\n####\n------- Run2InnerPhysicalLoop() chk1 -------");
-
+cout << flush;
     ComputePressureCL();
     clCheck(clFinish(m_queue), "Run", "clFinish", "After ComputePressureCL", mbDebug);
     printf("\n####\n------- Run2InnerPhysicalLoop() chk2 -------");
-
+cout << flush;
     ComputeForceCL ();
     clCheck(clFinish(m_queue), "Run", "clFinish", "After ComputeForceCL", mbDebug);
     printf("\n####\n------- Run2InnerPhysicalLoop() chk3 -------");
-
+cout << flush;
     if(launchParams.verbosity>1){
         TransferFromCL ();
         launchParams.file_increment++;
@@ -1966,7 +1967,7 @@ void FluidSystem::Run2InnerPhysicalLoop(){ //
         std::cout << "\n\nRun(relativePath,frame) Chk4, saved "<< launchParams.file_num+3 <<".csv  After CountingSortFullCL\n"<<std::flush;
     }
     printf("\n####\n------- Run2InnerPhysicalLoop() chk4 -------");
-
+cout << flush;
     TransferPosVelVeval ();
     clFinish(m_queue);
     printf("\n####\n------- Run2InnerPhysicalLoop() chk5 -------");

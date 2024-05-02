@@ -340,7 +340,7 @@ __kernel void prefixSum(
 
     // Declares a locally shared, temporary array, with dimemsions 2 x BLOCKSIZE (256 as of rn)
     __local uint scan_array[SCAN_BLOCKSIZE << 1];
-
+/*
                                                                                 //-------------------------------------------------------------------------------------
                                                                                 //      Assigning t1 and t2
                                                                                 //
@@ -354,12 +354,13 @@ __kernel void prefixSum(
                                                                                 //      [...]
                                                                                 //      [...]...
                                                                                 //  ]
+*/
     uint t1 = get_local_id(0) + get_group_id(0) * SCAN_BLOCKSIZE * 2;
 
     //printf("XXXXXXXXXXXXXXXXXXXXX THREAD: %u, LOCAL ID: %u, GROUP ID: %u, t1: %u\n", i, l, g, t1);
 
     uint t2 = t1 + SCAN_BLOCKSIZE;
-
+/*
                                                                                 //-------------------------------------------------------------------------------------
                                                                                 //      Pre-load into shared memory
                                                                                 // This also checks, if t1 or t2 exceed len = m_GridTotal (= 10000 as of rn).
@@ -368,10 +369,10 @@ __kernel void prefixSum(
 //     if (input[t1] != 0) printf("INPUT ARRAY Thread [%u]: %u. \t t1 = %u\n", i, input[t1], t1);            //Tells you which bins contain particles and how many.
 //     if (input[t2] != 0) printf("INPUT ARRAY Thread [%u]: %u. \t t2 = %u\n", i, input[t2],  t2);            //Tells you which bins contain particles and how many.
 //
-
+*/
     scan_array[get_local_id(0)] = (t1 < len) ? input[t1] : 0;
     barrier(CLK_LOCAL_MEM_FENCE);
-
+/*
 //     if (l == 8) printf("scan_array[get_local_id(0)] = %u\n", scan_array[get_local_id(0)]);
     // Print value of scan_array[1543]
 //         if (t1 == 1544) {
@@ -385,14 +386,15 @@ __kernel void prefixSum(
                                                                                 //         }
                                                                                 //     }
 
-
+*/
     scan_array[get_local_id(0) + SCAN_BLOCKSIZE] = (t2 < len) ? input[t2] : 0;
     barrier(CLK_LOCAL_MEM_FENCE);
-
+/*
                                                                                 //-------------------------------------------------------------------------------------
                                                                                 //      Reduction
                                                                                 // Each iteration, the first half of the previously calculated threads will be added to the second half
                                                                                 //
+*/
     int stride;
     for (stride = 1; stride <= SCAN_BLOCKSIZE; stride <<= 1) {
 
@@ -412,18 +414,20 @@ __kernel void prefixSum(
             scan_array[index + stride] += scan_array[index];
 
         // Buffer out (if thread < 16, print thread num and the data)
-
-
+        barrier(CLK_LOCAL_MEM_FENCE);
     }
-    barrier(CLK_LOCAL_MEM_FENCE);
+    //barrier(CLK_LOCAL_MEM_FENCE);
 
     // Output values & aux
     if (t1 + zeroff < len)    output[t1 + zeroff] = scan_array[get_local_id(0)];
+/*
     //if (t1 + zeroff < len && scan_array[get_local_id(0)] != 0)    printf("!!! scan_array[%lu] = %u\n", get_local_id(0), scan_array[get_local_id(0)]);
-//     if (t1 + zeroff < len && output[t1] != 0)    output[t1 + zeroff] = printf("OUTPUT: %u\n",  output[t1]);
+    //     if (t1 + zeroff < len && output[t1] != 0)    output[t1 + zeroff] = printf("OUTPUT: %u\n",  output[t1]);
+*/
     if (t2 + zeroff < len)    output[t2 + zeroff] = (get_local_id(0) == SCAN_BLOCKSIZE - 1 && zeroff) ? 0 : scan_array[get_local_id(0) + SCAN_BLOCKSIZE];
+/*
 //     if (t2 + zeroff < len && output[t2] != 0)    output[t2 + zeroff] = printf("OUTPUT: %u\n",  output[t2]);
-
+*/
     if (get_local_id(0) == 0) {
         if (zeroff) output[0] = 0;
         if (aux) aux[get_group_id(0)] = scan_array[2 * SCAN_BLOCKSIZE - 1];
@@ -594,16 +598,11 @@ if(get_global_id(0) == 1) {
                 fparticleidx[sort_ndx * BOND_DATA + a * DATA_PER_BOND + b] =
                 fparticleidxTemp[i * BOND_DATA + a * DATA_PER_BOND + b];
             }
-            felastidx[sort_ndx * BOND_DATA + a * DATA_PER_BOND + 5] =
-            fparticleidxTemp[i * BOND_DATA + a * DATA_PER_BOND + 5];
-            felastidx[sort_ndx * BOND_DATA + a * DATA_PER_BOND + 6] =
-            fparticleidxTemp[i * BOND_DATA + a * DATA_PER_BOND + 6];
-            felastidx[sort_ndx * BOND_DATA + a * DATA_PER_BOND + 7] =
-            fparticleidxTemp[i * BOND_DATA + a * DATA_PER_BOND + 7];
-            felastidx[sort_ndx * BOND_DATA + a * DATA_PER_BOND + 8] =
-            fparticleidxTemp[i * BOND_DATA + a * DATA_PER_BOND + 8];
-            felastidx[sort_ndx * BOND_DATA + a * DATA_PER_BOND + 8] =
-            fparticleidxTemp[i * BOND_DATA + a * DATA_PER_BOND + 8];
+            felastidx[sort_ndx * BOND_DATA + a * DATA_PER_BOND + 5] = fparticleidxTemp[i * BOND_DATA + a * DATA_PER_BOND + 5];
+            felastidx[sort_ndx * BOND_DATA + a * DATA_PER_BOND + 6] = fparticleidxTemp[i * BOND_DATA + a * DATA_PER_BOND + 6];
+            felastidx[sort_ndx * BOND_DATA + a * DATA_PER_BOND + 7] = fparticleidxTemp[i * BOND_DATA + a * DATA_PER_BOND + 7];
+            felastidx[sort_ndx * BOND_DATA + a * DATA_PER_BOND + 8] = fparticleidxTemp[i * BOND_DATA + a * DATA_PER_BOND + 8];
+            felastidx[sort_ndx * BOND_DATA + a * DATA_PER_BOND + 8] = fparticleidxTemp[i * BOND_DATA + a * DATA_PER_BOND + 8];
 
         }
             for (int a = 0; a < BONDS_PER_PARTICLE; a++) {
@@ -638,6 +637,47 @@ if(get_global_id(0) == 1) {
                 fconc[sort_ndx * NUM_TF + i] = fconcTemp[i * NUM_TF + i];
             }
 
+            if(get_global_id(0) == 1) {
+                printf("Thread Index: %d\n", i);
+                printf("sort_ndx: %d\n", sort_ndx);
+                printf("fbin: (%f, %f, %f, %f)\n", fbin[sort_ndx].x, fbin[sort_ndx].y, fbin[sort_ndx].z, fbin[sort_ndx].w);
+                printf("fbin_offset: %u\n", fbin_offset[sort_ndx]);
+                printf("fpos: (%f, %f, %f, %f)\n", fpos[sort_ndx].x, fpos[sort_ndx].y, fpos[sort_ndx].z, fpos[sort_ndx].w);
+                printf("fvel: (%f, %f, %f, %f)\n", fvel[sort_ndx].x, fvel[sort_ndx].y, fvel[sort_ndx].z, fvel[sort_ndx].w);
+                printf("fveval: (%f, %f, %f, %f)\n", fveval[sort_ndx].x, fveval[sort_ndx].y, fveval[sort_ndx].z, fveval[sort_ndx].w);
+                printf("fforce: (%f, %f, %f, %f)\n", fforce[sort_ndx].x, fforce[sort_ndx].y, fforce[sort_ndx].z, fforce[sort_ndx].w);
+                printf("fpress: %f\n", fpress[sort_ndx]);
+                printf("fdensity: %f\n", fdensity[sort_ndx]);
+                printf("fage: %u\n", fage[sort_ndx]);
+                printf("fcolor: %u\n", fcolor[sort_ndx]);
+                printf("fgcell: %u\n", fgcell[sort_ndx]);
+                printf("fgndx: %u\n", fgndx[sort_ndx]);
+                printf("felastidx: %u\n", felastidx[sort_ndx]);
+                printf("fparticleidx: %u\n", fparticleidx[sort_ndx]);
+                printf("fparticle_id: %u\n", fparticle_id[sort_ndx]);
+                printf("fmass_radius: %u\n", fmass_radius[sort_ndx]);
+                printf("fnerveidx: %u\n", fnerveidx[sort_ndx]);
+                printf("fepigen: %u\n", fepigen[sort_ndx]);
+                printf("fconc: %u\n", fconc[sort_ndx]);
+
+                printf("fposTemp: (%f, %f, %f, %f)\n", fposTemp[i].x, fposTemp[i].y, fposTemp[i].z, fposTemp[i].w);
+                printf("fvelTemp: (%f, %f, %f, %f)\n", fvelTemp[i].x, fvelTemp[i].y, fvelTemp[i].z, fvelTemp[i].w);
+                printf("fvevalTemp: (%f, %f, %f, %f)\n", fvevalTemp[i].x, fvevalTemp[i].y, fvevalTemp[i].z, fvevalTemp[i].w);
+                printf("fforceTemp: (%f, %f, %f, %f)\n", fforceTemp[i].x, fforceTemp[i].y, fforceTemp[i].z, fforceTemp[i].w);
+                printf("fpressTemp: %f\n", fpressTemp[i]);
+                printf("fdensityTemp: %f\n", fdensityTemp[i]);
+                printf("fageTemp: %u\n", fageTemp[i]);
+                printf("fcolorTemp: %u\n", fcolorTemp[i]);
+                printf("fgcellTemp: %u\n", fgcellTemp[i]);
+                printf("fgndxTemp: %u\n", fgndxTemp[i]);
+                printf("felastidxTemp: %u\n", felastidxTemp[i]);
+                printf("fparticleidxTemp: %u\n", fparticleidxTemp[i]);
+                printf("fparticle_idTemp: %u\n", fparticle_idTemp[i]);
+                printf("fmass_radiusTemp: %u\n", fmass_radiusTemp[i]);
+                printf("fnerveidxTemp: %u\n", fnerveidxTemp[i]);
+                printf("fepigenTemp: %u\n", fepigenTemp[i]);
+                printf("fconcTemp: %u\n", fconcTemp[i]);
+            }
         }
 }
 

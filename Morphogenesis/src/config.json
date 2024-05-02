@@ -1,6 +1,6 @@
 {
 
-    "demo_path":"demo",                               // optional! specify the name of you demo folder within the /Morphogenesis/src/ directory,
+    "demo_path":"demo",                             // optional! specify the name of you demo folder within the /Morphogenesis/src/ directory,
 
     "data_file_offset":0,                           //475;//10;//46;//462;//380;//0;
 

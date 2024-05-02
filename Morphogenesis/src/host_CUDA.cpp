@@ -60,6 +60,8 @@ void FluidSystem::FluidSetupCL ( int num, int gsrch, int3 res, cl_float3 size, c
 
     // Compute particle buffer & grid dimensions
     m_FParams.szPnts = (m_FParams.numGroups  * m_FParams.numItems);
+
+    std::cout << "\nhost_CUDA.cpp  FluidSystem::FluidSetupCL ()  :   m_FParams.numItems = " << m_FParams.numItems << flush;
 }
 
 // void FluidSystem::FluidParamCL ( float ss, float sr, float pr, float mass, float rest, cl_float3 bmin, cl_float3 bmax, float estiff, float istiff, float visc, float surface_tension, float damp, float fmin, float fmax, float ffreq, float gslope, float gx, float gy, float gz, float al, float vl, float a_f, float a_p ){
