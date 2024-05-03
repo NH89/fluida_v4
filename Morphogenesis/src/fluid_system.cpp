@@ -1937,6 +1937,8 @@ void FluidSystem::Run2PhysicalSort(){ // beginning of every time step, sorrting 
     cout << "\nCHECK 1.1 Run2Simulation() \n" << flush;
     CountingSortFullCL ( 0x0 );
     clCheck(clFinish(m_queue), "Run", "clFinish", "After CountingSortFullCL", mbDebug);
+
+    printf("\nIndices: spacer");
     printf("\nCHECK 1.2 Run2Simulation() \n");
     if(verbosity>0)std::cout<<"\n####\nRun2PhysicalSort()end";
 }
@@ -2704,5 +2706,3 @@ void FluidSystem::Run2Simulation(){
     WriteGenome( launchParams.outPath );
     WriteSpecificationFile_fromLaunchParams( launchParams.outPath );
 }
-
-

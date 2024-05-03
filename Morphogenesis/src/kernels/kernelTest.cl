@@ -49,8 +49,7 @@
 #include "../fluid.h"
 #include "../randCL_well512.cl"
 
-
-// __constant struct FParams	fparam  = {
+/* // __constant struct FParams	fparam  = {
 //         .debug = 2,
 // 		.numItems = 0, .numGroups = 0, .itemsPerGroup = 0,
 // 		.gridThreads = 0, .gridBlocks = 0,
@@ -84,6 +83,7 @@
 //                     0, 0, 0, 0, 0, 0, 0, 0,
 //                     0, 0, 0, 0, 0, 0, 0, 0}
 // 	};			// CPU Fluid params
+*/
 __constant struct FBufs			fbuf = {};
 			// GPU Particle buffers (unsorted). An FBufs struct holds an array of pointers.
 __constant struct FBufs			ftemp = {};			// GPU Particle buffers (sorted)
@@ -179,12 +179,12 @@ __kernel void insertParticlesCL(
 __kernel void insertParticlesCL(
     __global struct FParams* m_FParamsDevice,
     int pnum,
-    volatile __global float4* fpos,
-    volatile __global uint* fgcell,
-    volatile __global uint* fgndx,
-    volatile __global uint* fepigen,
-    volatile __global int* fgridcnt,
-    volatile __global int* fgridcnt_active_genes
+    volatile __global float4*   fpos,
+    volatile __global uint*     fgcell,
+    volatile __global uint*     fgndx,
+    volatile __global uint*     fepigen,
+    volatile __global int*      fgridcnt,
+    volatile __global int*      fgridcnt_active_genes
     )
 {
 uint i = get_global_id(0);
@@ -197,31 +197,30 @@ uint i = get_global_id(0);
     int     gridTot     =  m_FParamsDevice->gridTotal;
 
     float4 gcf = (fpos[i] - gridMin) * gridDelta;
-
-    printf("GCF after Calculation: Thread ID: %u, gcf: (%f, %f, %f), gridDelta: (%f, %f, %f)\n",
-        i, gcf.x, gcf.y, gcf.z, gridDelta.x, gridDelta.y, gridDelta.z);
+/*
+    //printf("GCF after Calculation: Thread ID: %u, gcf: (%f, %f, %f), gridDelta: (%f, %f, %f)\n",
+    //    i, gcf.x, gcf.y, gcf.z, gridDelta.x, gridDelta.y, gridDelta.z);
+*/
     int4 gc  = (int4)(gcf.x, gcf.y, gcf.z, gcf.w);
     int gs  = (gc.y * gridRes.z + gc.z) * gridRes.x + gc.x;
-
+/*
     printf("Thread ID: %u, m_FParamsDevice->gridDelta: (%f, %f, %f)\n",
         i, m_FParamsDevice->gridDelta.x, m_FParamsDevice->gridDelta.y, m_FParamsDevice->gridDelta.z);
 
     printf("Thread ID: %u, float4 fpos[%u]: (%v4hlf)\n",
         i, i, fpos[i]);
-
+*/
     if(i==pnum-1) printf("\n\ninsertParticles()1: gridTot=%i,  i=%u: gc.x=%i, gc.y=%i, gc.z=%i, gs=%i \t gridScan.x=%i, gridScan.y=%i, gridScan.z=%i, gridTot=%u,\t gridDelta=(%f,%f,%f) gridMin=(%f,%f,%f) gridRes=(%i,%i,%i)",
     gridTot, i, gc.x, gc.y, gc.z, gs,  gridScan.x, gridScan.y, gridScan.z, gridTot, gridDelta.x, gridDelta.y, gridDelta.z,  gridMin.x, gridMin.y, gridMin.z, gridRes.x, gridRes.y, gridRes.z );
 
     if ( gc.x >= 1 && gc.x <= gridScan.x && gc.y >= 1 && gc.y <= gridScan.y && gc.z >= 1 && gc.z <= gridScan.z ) {
 
-		fgcell[i] = gs;                                    // Grid cell insert.
-
-        printf("Thread ID: %u, fgridcnt[%d] before atomic_add: %d\n", i, gs, fgridcnt[gs]);
-        fgndx[i] = atomic_add(&fgridcnt[gs], 1);          // Grid counts.
-        printf("Thread ID: %u, fgridcnt[%d] after atomic_add: %d\n", i, gs, fgridcnt[gs]);
+		fgcell[i]   = gs;                                    // Grid cell insert.
+        uint result = atomic_add(&fgridcnt[gs], 1);          // Grid counts.
+        fgndx[i]    = result;
 
         // Index of each particle within its bin.
-        printf("Thread ID: %u, fgndx: %u\n", i, fgndx[i]);
+        printf("Thread ID: %u, fgndx: %u,  gs=%u,      fgcell[i]=%u,  fgridcnt[gs]=%u\n",    i, fgndx[i], gs,     fgcell[i], fgridcnt[gs] );
 
         for(int gene=0; gene<NUM_GENES; gene++){ // NB data ordered FEPIGEN[gene][particle] AND +ve int values -> active genes.
             //if(m_FParamsDevice->debug>2 && i==0)printf("\n");
@@ -488,6 +487,7 @@ __kernel void countingSortFull(
     volatile __global uint*   fnerveidx,
     volatile __global uint*   fepigen,
     volatile __global uint*   fconc,
+
     volatile __global float4* fposTemp,
     volatile __global float4* fvelTemp,
     volatile __global float4* fvevalTemp,
@@ -513,7 +513,7 @@ __kernel void countingSortFull(
     //printf("Thread Index: %d, Value: (%f, %f, %f, %f)\n", i, fposTemp[i].x, fposTemp[i].y, fposTemp[i].z, fposTemp[i].w);
 
 if(get_global_id(0) == 1) {
-        printf("Thread Index: %d\n", i);
+        printf("\nThread Index: %d\n", i);
         printf("fbin: (%f, %f, %f, %f)\n", fbin[i].x, fbin[i].y, fbin[i].z, fbin[i].w);
         printf("fbin_offset: %u\n", fbin_offset[i]);
         printf("fpos: (%f, %f, %f, %f)\n", fpos[i].x, fpos[i].y, fpos[i].z, fpos[i].w);
@@ -532,7 +532,8 @@ if(get_global_id(0) == 1) {
         printf("fmass_radius: %u\n", fmass_radius[i]);
         printf("fnerveidx: %u\n", fnerveidx[i]);
         printf("fepigen: %u\n", fepigen[i]);
-        printf("fconc: %u\n", fconc[i]);
+        printf("fconc: %u\n\n", fconc[i]);
+
         printf("fposTemp: (%f, %f, %f, %f)\n", fposTemp[i].x, fposTemp[i].y, fposTemp[i].z, fposTemp[i].w);
         printf("fvelTemp: (%f, %f, %f, %f)\n", fvelTemp[i].x, fvelTemp[i].y, fvelTemp[i].z, fvelTemp[i].w);
         printf("fvevalTemp: (%f, %f, %f, %f)\n", fvevalTemp[i].x, fvevalTemp[i].y, fvevalTemp[i].z, fvevalTemp[i].w);
@@ -549,17 +550,16 @@ if(get_global_id(0) == 1) {
         printf("fmass_radiusTemp: %u\n", fmass_radiusTemp[i]);
         printf("fnerveidxTemp: %u\n", fnerveidxTemp[i]);
         printf("fepigenTemp: %u\n", fepigenTemp[i]);
-        printf("fconcTemp: %u\n", fconcTemp[i]);
-
+        printf("fconcTemp: %u\n\n", fconcTemp[i]);
 }
 
     if (i >= pnum) return;
     if (m_FParamsDevice->debug > 1 && i == 0) printf("\ncountingSortFull(): pnum=%u\n", pnum);
-    uint icell = fgcell[i];
+    uint icell = fgcellTemp[i];
     if (icell != GRID_UNDEF) {
-        uint indx = fgcell[i];
+        uint indx = fgndx[i];
         int sort_ndx = fbin_offset[icell] + indx;
-        //printf("\nIndices: indx = %u, sort_ndx = %d\n", indx, sort_ndx);
+        printf("\nIndices: i=%u,    icell= fgcell[i]=%u,    fbin_offset[icell]=%u,    indx= fgndx[i]= %u,    sort_ndx = fbin_offset[icell] + indx = %d\n",i, icell, fbin_offset[icell], indx, sort_ndx);
 
         float4 zero = (float4)(0, 0, 0, 0);
 
@@ -638,7 +638,7 @@ if(get_global_id(0) == 1) {
             }
 
             if(get_global_id(0) == 1) {
-                printf("Thread Index: %d\n", i);
+                printf("\nThread Index: %d\n", i);
                 printf("sort_ndx: %d\n", sort_ndx);
                 printf("fbin: (%f, %f, %f, %f)\n", fbin[sort_ndx].x, fbin[sort_ndx].y, fbin[sort_ndx].z, fbin[sort_ndx].w);
                 printf("fbin_offset: %u\n", fbin_offset[sort_ndx]);
@@ -658,7 +658,7 @@ if(get_global_id(0) == 1) {
                 printf("fmass_radius: %u\n", fmass_radius[sort_ndx]);
                 printf("fnerveidx: %u\n", fnerveidx[sort_ndx]);
                 printf("fepigen: %u\n", fepigen[sort_ndx]);
-                printf("fconc: %u\n", fconc[sort_ndx]);
+                printf("fconc: %u\n\n", fconc[sort_ndx]);
 
                 printf("fposTemp: (%f, %f, %f, %f)\n", fposTemp[i].x, fposTemp[i].y, fposTemp[i].z, fposTemp[i].w);
                 printf("fvelTemp: (%f, %f, %f, %f)\n", fvelTemp[i].x, fvelTemp[i].y, fvelTemp[i].z, fvelTemp[i].w);
@@ -676,7 +676,7 @@ if(get_global_id(0) == 1) {
                 printf("fmass_radiusTemp: %u\n", fmass_radiusTemp[i]);
                 printf("fnerveidxTemp: %u\n", fnerveidxTemp[i]);
                 printf("fepigenTemp: %u\n", fepigenTemp[i]);
-                printf("fconcTemp: %u\n", fconcTemp[i]);
+                printf("fconcTemp: %u\n\n", fconcTemp[i]);
             }
         }
 }
