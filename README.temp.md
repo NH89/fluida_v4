@@ -22,7 +22,7 @@ A morphogenesis simulator _(in progress)_ , with soft-matter elasticity, diffusi
 The notes below are rough working notes, and will change with development.
 
 ### Dependencies 
-VTK is used for .vtp file output for visualization in Parraview.
+VTK is used for .vtp file output for visualization in Paraview.
 NB vtk-dev is broken in Ubuntu 18.04 LTS. 
 You may need to build VTK from source.
 This code has been developed with VTK-9.0.1 .

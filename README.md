@@ -242,7 +242,7 @@ This does not arise where the two programs are run on separate machines, as when
     
     From the top menu bar, select "Filters->Common->Treshold"
     In Properties(Thresold2), in scalars, select FPARTICLE_ID.
-    Set Maximum to the number of active particles in the simulation.
+    Set "Maximum" to the number of active particles in the simulation.
     click "Apply" (green button in Properties)
     In the third row of the tool bar, click "zoom to data" icon (four arrows pointing inwards).
     NB this is necessary, when unused particles are stored in one corner of the simulation, 
