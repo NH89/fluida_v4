@@ -171,3 +171,6 @@ _deps
 /data/demo/
 /data/test/
 /Debug/
+./old-*
+*.kdev4
+src/build/*

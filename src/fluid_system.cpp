@@ -119,16 +119,24 @@ void FluidSystem::Initialize (){             // used for CPU only for "check_dem
 
 // /home/nick/Programming/Cuda/Morphogenesis/build/install/ptx/objects/fluid_systemPTX/fluid_system_cuda.ptx
 void FluidSystem::InitializeCuda (){         // used for load_sim  /home/nick/Programming/Cuda/Morphogenesis/build/install/ptx/objects-Debug/fluid_systemPTX/fluid_system_cuda.ptx
+cout << "\nFluidSystem::InitializeCuda : chk_1 "<<std::flush;
     if (m_FParams.debug>1)std::cout << "FluidSystem::InitializeCuda () \n";
     char* morphogenesis_ptx = std::getenv("MORPHOGENESIS_HOME");
-    
+
+cout << "\nFluidSystem::InitializeCuda : chk_1.1 morphogenesis_ptx : "<< morphogenesis_ptx<< std::flush;
     //Find release-type & path to ptx file
     sprintf( morphogenesis_ptx, "%s/ptx", morphogenesis_ptx);
+cout << "\nFluidSystem::InitializeCuda : chk_1.1.1  morphogenesis_ptx : "<< morphogenesis_ptx<< std::flush;
+
     DIR *dir = opendir(morphogenesis_ptx);
+cout << "\nFluidSystem::InitializeCuda : chk_1.1.2 "<< std::flush;
+
     const char *name;
     const char* names[5]= { "objects", "objects-Debug", "objects-Release", "objects-RelWithDebInfo", "objects-MinSizeRel" };
     struct dirent *ent;
     int entry_num = 0;
+
+cout << "\nFluidSystem::InitializeCuda : chk_1.2 "<<std::flush;
     while((ent = readdir(dir)) != NULL) {
         if (m_FParams.debug>1)std::cout << "\nInitializeCuda: chk 6, ent->d_name="<<ent->d_name<<", entry_num="<< entry_num <<" \n";
         for (int i=0; i<5; i++){
@@ -142,11 +150,13 @@ void FluidSystem::InitializeCuda (){         // used for load_sim  /home/nick/Pr
         if (name != NULL) break;
         entry_num++;
     }
+cout << "\nFluidSystem::InitializeCuda : chk_2 "<<std::flush;
     sprintf( morphogenesis_ptx, "%s/%s/fluid_systemPTX/fluid_system_cuda.ptx", morphogenesis_ptx, name);  
     if (m_FParams.debug>1)std::cout<<"\n release type = "<<name<<"\t ptx path = "<<morphogenesis_ptx<<std::flush;
     cuCheck ( cuModuleLoad ( &m_Module, morphogenesis_ptx), "LoadKernel", "cuModuleLoad", morphogenesis_ptx, mbDebug);  
     // loads the file "fluid_system_cuda.ptx" as a module with pointer  m_Module.
 
+cout << "\nFluidSystem::InitializeCuda : chk_3 "<<std::flush;
     if (m_FParams.debug>1)std::cout << "Chk1.1 \n";
     LoadKernel ( FUNC_INSERT,                           "insertParticles" );
     LoadKernel ( FUNC_COUNTING_SORT,                    "countingSortFull" );
@@ -185,6 +195,7 @@ void FluidSystem::InitializeCuda (){         // used for load_sim  /home/nick/Pr
     LoadKernel ( FUNC_ASSEMBLE_MUSCLE_FIBRES_INCOMING,  "assembleMuscleFibresInComing");
     LoadKernel ( FUNC_INITIALIZE_BONDS,                 "initialize_bonds");
 
+cout << "\nFluidSystem::InitializeCuda : chk_4 "<<std::flush;
     if (m_FParams.debug>1)std::cout << "Chk1.2 \n";
     size_t len = 0;
     cuCheck ( cuModuleGetGlobal ( &cuFBuf,    &len,	m_Module, "fbuf" ),		"LoadKernel", "cuModuleGetGlobal", "cuFBuf",    mbDebug);   // Returns a global pointer (cuFBuf) from a module  (m_Module), see line 81.

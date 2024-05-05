@@ -103,7 +103,7 @@ mkdir -p ../data/test
 mkdir -p ../build
 cd ../build
 
-echo 'Building & installing Morphogenesis'
+echo '\n\n##Building & installing Morphogenesis'
 ccmake ../src
 make install
 
@@ -112,16 +112,16 @@ module avail morphogenesis
 env | grep morphogenesis
 echo $PATH
 
-echo 'Generating Morphogenesis Demo model'
+echo '\n\n##Generating Morphogenesis Demo model'
 cd ../data
 make_demo   #use default
 
 
-echo 'Checking read-write of model'
+echo '\n\n##Checking read-write of model'
 check_demo  demo  check
 
 #echo 'Test run of simulation'
 #make_demo2  demo
 
 
-echo 'Install of Morphogenesis complete'
+echo '\n\n##Install of Morphogenesis complete'

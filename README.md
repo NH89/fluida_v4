@@ -48,8 +48,12 @@ If Environment Modules are installed (e.g. on a GPU cluster), then the script in
 
 #### vtk-9
 
+    Morphogenesis depends on vtk-9.x . 
+    See #includes in fluid_system.h . 
+    You may need to adjust the sub-version number.
+
     cd Morphogenesis/src
-    bash ./install_scripts/install_vtk-9.0.1.sh
+    bash ./install_scripts/install_vtk-9.0.1.sh    ## obsolete
     
     
 

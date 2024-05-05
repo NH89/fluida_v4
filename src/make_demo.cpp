@@ -11,6 +11,7 @@ typedef	unsigned int		uint;
 
 int main ( int argc, const char** argv ) 
 {
+    printf ( "\n\n### Starting Morphogenesis  \"make_demo\" ### \n" );
     uint num_particles, demoType, simSpace;
     float spacing, x_dim, y_dim, z_dim;
     if ( argc != 8 && argc !=1 ) {
@@ -20,6 +21,8 @@ int main ( int argc, const char** argv )
             6:Morphogenesis small demo  7:use SpecificationFile.txt  8:parameter sweep default )\n" );
         return 0;
     } else if (argc == 8) {
+        printf ( "\nargc == 8");
+
         num_particles = atoi(argv[1]);
         printf ( "num_particles = %u\n", num_particles );
         
@@ -42,6 +45,8 @@ int main ( int argc, const char** argv )
         printf ( "simSpace = %u, (0:regression test, 1:tower, 2:wavepool, 3:small dam break, 4:dual-wavepool, 5: microgravity, \n \
             6:Morphogenesis small demo  7:use SpecificationFile.txt  8:parameter sweep default )\n\n", simSpace);
     }  else {
+        printf ( "\nargc == 1");
+
         num_particles = 4000;
         printf ( "num_particles = %u\n", num_particles );
         
@@ -68,6 +73,8 @@ int main ( int argc, const char** argv )
     uint debug = 2;  // same values as in load_sim and in specification_file.txt .
     FluidSystem fluid;
     
+    std::cout <<"\nmake_demo : launchParams.read_genome = " << fluid.launchParams.read_genome <<",\t  launchParams.genomePath = "<<  fluid.launchParams.genomePath<<std::endl<<std::flush;
+
     fluid.WriteDemoSimParams("./demo", GPU_OFF, CPU_YES , num_particles, spacing, x_dim, y_dim, z_dim, demoType, simSpace, debug);/*const char * relativePath*/ 
     
     if(argc !=1){                                           // i.e not relying on defaults in simspace 8

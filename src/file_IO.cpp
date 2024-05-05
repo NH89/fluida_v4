@@ -1013,6 +1013,8 @@ void FluidSystem::WriteSimParams ( const char * relativePath ){
 void FluidSystem::WriteDemoSimParams ( const char * relativePath, int gpu_mode, int cpu_mode, uint num_particles, float spacing, float x_dim, float y_dim, float z_dim, uint demoType, uint simSpace, uint debug){
     m_FParams.debug=debug;
     
+    std::cout<<"\nFluidSystem::WriteDemoSimParams chk_0  "<<std::flush;
+
     if (m_FParams.debug>1)std::cout<<"\nWriteDemoSimParams chk1, num_particles="<<num_particles<<", m_FParams.debug="<<m_FParams.debug <<", launchParams.genomePath="<< launchParams.genomePath  <<std::flush;
     
     m_Param[PEXAMPLE] = simSpace;          // simSpace==2 : wave pool example.
@@ -1025,10 +1027,12 @@ void FluidSystem::WriteDemoSimParams ( const char * relativePath, int gpu_mode, 
     if (m_FParams.debug>1)std::cout<<"\nWriteDemoSimParams chk2, launchParams.genomePath="<< launchParams.genomePath  <<std::flush;
     
     SetupDefaultParams();           // set up the standard demo
+    std::cout <<"\nFluidSystem::WriteDemoSimParams : launchParams.read_genome = " << launchParams.read_genome <<",\t  launchParams.genomePath = "<<  launchParams.genomePath<<std::endl<<std::flush;
     
     SetupExampleParams(spacing);
-    
-    if (launchParams.read_genome !='y'){
+    std::cout <<"\nFluidSystem::WriteDemoSimParams : launchParams.read_genome = " << launchParams.read_genome <<",\t  launchParams.genomePath = "<<  launchParams.genomePath <<std::endl<<std::flush;
+
+    if (launchParams.read_genome !='y' || launchParams.genomePath[0] =='\0'){ // NB SetupExampleParams(..) may set launchParams.read_genome ='y'
         std::cout<<"\nWriteDemoSimParams(): calling SetupExampleGenome();"<<std::flush;
         SetupExampleGenome();
     }// NB default initialization is launchParams.read_genome='n', => used by make_demo.cpp.

@@ -23,7 +23,7 @@ int main ( int argc, const char** argv )
         sprintf ( output_folder, "%s", argv[2] );
         printf ( "input_folder = %s , output_folder = %s\n", input_folder, output_folder );
     }
-    
+cout << "\nmake_demo2: chk_1 "<<std::flush;
     // Initialize
     cuInit ( 0 );
     int deviceCount = 0;
@@ -32,17 +32,23 @@ int main ( int argc, const char** argv )
         printf ( "There is no device supporting CUDA.\n" );
         exit ( 0 );
     }
+cout << "\nmake_demo2: chk_2 "<<std::flush;
     CUdevice cuDevice;
     cuDeviceGet ( &cuDevice, 0 );
     CUcontext cuContext;
     cuCtxCreate ( &cuContext, 0, cuDevice );
-    
+cout << "\nmake_demo2: chk_3 "<<std::flush;
     FluidSystem fluid;
+
+fluid.launchParams.debug = 3;
+cout << "\nmake_demo2: chk_4 "<<std::flush;
     fluid.InitializeCuda ();
     //std::cout<<"\n\nmake_demo2 chk0,"<<std::flush;
-    
+cout << "\nmake_demo2: chk_5 , input_folder : "<<input_folder<<std::flush;
     fluid.ReadSpecificationFile ( input_folder );
-    std::cout<<"\n\nmake_demo2 chk1, fluid.launchParams.debug="<<fluid.launchParams.debug<<", fluid.launchParams.genomePath=" <<fluid.launchParams.genomePath  << ",  fluid.launchParams.spacing="<<fluid.launchParams.spacing<<std::flush;
+
+
+std::cout<<"\n\nmake_demo2 chk6, fluid.launchParams.debug="<<fluid.launchParams.debug<<", fluid.launchParams.genomePath=" <<fluid.launchParams.genomePath  << ",  fluid.launchParams.spacing="<<fluid.launchParams.spacing<<std::flush;
     
     for(int i=0; i<256; i++){fluid.launchParams.paramsPath[i] = input_folder[i];}
     for(int i=0; i<256; i++){fluid.launchParams.pointsPath[i] = input_folder[i];}
@@ -52,6 +58,9 @@ int main ( int argc, const char** argv )
     if(mkdir(output_folder, 0755) == -1) cerr << "\nError :  failed to create output_folder.\n" << strerror(errno) << endl;
     else cout << "output_folder created\n"; // NB 0755 = rwx owner, rx for others.
     
+std::cout<<"\n\nmake_demo2 chk7, fluid.launchParams.debug="<<fluid.launchParams.debug<<", fluid.launchParams.genomePath=" <<fluid.launchParams.genomePath  << ",  fluid.launchParams.spacing="<<fluid.launchParams.spacing<<std::flush;
+
+
     fluid.WriteDemoSimParams(           // Generates the simulation from data previously loaded from SpecificationFile.txt .
         fluid.launchParams.paramsPath, GPU_DUAL, CPU_YES, fluid.launchParams.num_particles, fluid.launchParams.spacing, fluid.launchParams.x_dim, fluid.launchParams.y_dim, fluid.launchParams.z_dim, fluid.launchParams.demoType, fluid.launchParams.simSpace, fluid.launchParams.debug
     ); /*const char * relativePath*/ 
