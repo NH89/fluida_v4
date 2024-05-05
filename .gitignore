@@ -1,4 +1,10 @@
 
+### Kdevelop
+*.kdev4
+src/build/*
+src/.kdev4/*
+
+
 # Created by https://www.toptal.com/developers/gitignore/api/cmake,clion,cuda,c++
 # Edit at https://www.toptal.com/developers/gitignore?templates=cmake,clion,cuda,c++
 
