@@ -1713,6 +1713,7 @@ void FluidSystem::Init_CLRand (){
     free(seeds);
                                                                                                                                                         if(verbosity>0) cout << "\n-----Init_CLRand() finished-----\n\n" << flush;
 }
+/*
 //     unsigned long long  seed=0;
 //     srand (time(NULL));
 //     for (int i=0;i<mNumPoints;i++){
@@ -1733,7 +1734,7 @@ void FluidSystem::Init_CLRand (){
 //     clCheck( clEnqueueWriteBuffer(m_queue, gpuVar(&m_Fluid, FCURAND_SEED), CL_TRUE, 0, mNumPoints * sizeof(uint), bufC(&m_Fluid, FCURAND_SEED), 0, NULL, NULL), "Init_FCURAND_STATE_CL", "clEnqueueWriteBuffer", "FCURAND_SEED", mbDebug );
 //
 //     if (verbosity>1) std::cout <<"\nInit_FCURAND_STATE_CL_2.0\n\n"<<std::flush;
-
+*/
     /*
     int n=0;
     void* args[1] = {&n};
@@ -1757,6 +1758,7 @@ void FluidSystem::Init_CLRand (){
     "\t m_FParams.numGroups="<<m_FParams.numGroups<<",  m_FParams.numItems="<<m_FParams.numItems<<".  \n"<<std::flush;
 
     */
+/*
 //     size_t streamBufferSize;
 
 //     size_t global_size_work = mNumPoints;
@@ -1773,6 +1775,7 @@ void FluidSystem::Init_CLRand (){
     // The kernel takes two arguments; set them to buf_in, buf_out.
 //     clCheck( clSetKernelArg(m_Kern[FUNC_INIT_RANDOMCL], 0, sizeof (buf_in), &buf_in), "Init_FCURAND_STATE_CL", "clSetKernelArg", "buf_in", 1);
 //     clCheck( clSetKernelArg(m_Kern[FUNC_INIT_RANDOMCL], 1, sizeof (buf_out), &buf_out), "Init_FCURAND_STATE_CL", "clSetKernelArg", "buf_out", 1);
+*/
 /*
     // Enqueue the kernel on device.
     cl_event ev;
@@ -1878,11 +1881,11 @@ void FluidSystem::PrefixSumChangesCL ( int zero_offsets ){
         }
     }
 }*/
-
+/*
 // void FluidSystem::CountingSortChangesCL ( ){
 //     //std::cout<<"\n\n#### CountingSortChangesCL ( ):   verbosity = "<< verbosity <<"\n";
 //     if (verbosity>1) {std::cout<<"\n\n#### CountingSortChangesCL ( )"<<std::flush;}
-//     /* ////////
+//     / * ////////
 //     clCheck( cuMemcpyDtoH ( bufI(&m_Fluid, FDENSE_LIST_LENGTHS_CHANGES), gpuVar(&m_Fluid, FDENSE_LIST_LENGTHS_CHANGES),	sizeof(uint[NUM_CHANGES]) ), "PrefixSumCellsCL", "cuMemcpyDtoH", "FDENSE_LIST_LENGTHS_CHANGES", mbDebug);
 //
 //                                                                                                                     // If active particles for change_list > existing buff, then enlarge buff.
@@ -1891,7 +1894,7 @@ void FluidSystem::PrefixSumChangesCL ( int zero_offsets ){
 //         uint * denselist_len = bufI(&m_Fluid, FDENSE_LIST_LENGTHS_CHANGES);                                           // For each change_list allocate intial buffer,
 //         if (verbosity>1)printf("\nCountingSortChangesCL1: change_list=%u,  densebuff_len[change_list]=%u, denselist_len[change_list]=%u ,",change_list, densebuff_len[change_list], denselist_len[change_list] );
 //     }
-//     *//////////
+//     * //////////
 //     int blockSize = SCAN_BLOCKSIZE/2 << 1;
 //     int numElem1 = m_GridTotal;
 //     int numElem2 = 2* int( numElem1 / blockSize ) + 1;
@@ -1925,6 +1928,7 @@ void FluidSystem::PrefixSumChangesCL ( int zero_offsets ){
 //     }
 // }
 //
+*/
 void FluidSystem::InitializeBondsCL (){
 
     cl_int status;
