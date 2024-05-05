@@ -1154,17 +1154,11 @@ void FluidSystem::WriteResultsCSV ( const char * input_folder, const char * outp
     fclose(fp);
 }
 
-void FluidSystem::SaveUintArray( uint* array, int numElem1, const char * relativePath ){ /// Used to save an array to .csv for debugging.
-    char buf[256];
 
-    //Find working directory-----------------------------
-    fs::path Path = fs::current_path().parent_path();
-    const char* directory = Path.c_str();
-    std::cout << "Directory: " << directory << std::flush;
-
-    sprintf ( buf, "%s/%s", directory, relativePath);
-    FILE* fp = fopen ( buf , "w" );
-
+void FluidSystem::SaveUintArray( uint* array, int numElem1, const char * relativePath, float count ){ /// Used to save an array to .csv for debugging.
+    stringstream ss;
+    ss << launchParams.outPath << "/" << count<< relativePath;
+    FILE* fp = fopen ( ss.str().c_str()  , "w" );
     if (fp == NULL) {
         if (verbosity>0) std::cout << "\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++void FluidSystem::SaveUintArray ( const char * relativePath, int frame )  Could not open file "<< fp <<"\n"<< std::flush;
         assert(0);
@@ -1175,15 +1169,14 @@ void FluidSystem::SaveUintArray( uint* array, int numElem1, const char * relativ
     }
     fclose ( fp );
     fflush ( fp );
-    std::string s;
-    std::stringstream ss;
-    ss << relativePath;
-    ss >> s;
-    if (verbosity>1) cout<<"\nSaved UintArray file: "<< s <<"\n"<<std::flush;
+    if (verbosity>1) cout<<"\nSaved UintArray file: "<< ss.str().c_str() <<"\n"<<std::flush;
 }
 
-void FluidSystem::SaveUintArray_2Columns( uint* array, int numElem1, int buff_len, const char * relativePath ){ /// Used to save DESNSE_LIST_CHANGES (particle,bondIdx) arrays to .csv for debugging.
-   FILE* fp = fopen ( relativePath, "w" );
+
+void FluidSystem::SaveUintArray_2Columns( uint* array, int numElem1, int buff_len, const char * relativePath , float count ){ /// Used to save DESNSE_LIST_CHANGES (particle,bondIdx) arrays to .csv for debugging.
+    stringstream ss;
+    ss << launchParams.outPath << "/" << count<< relativePath;
+    FILE* fp = fopen ( ss.str().c_str()  , "w" );
     if (fp == NULL) {
         if (verbosity>1) std::cout << "\nvoid FluidSystem::SaveUintArray_2Collumns ( const char * relativePath, int frame )  Could not open file "<< fp <<"\n"<< std::flush;
         assert(0);
@@ -1194,15 +1187,13 @@ void FluidSystem::SaveUintArray_2Columns( uint* array, int numElem1, int buff_le
     }
     fclose ( fp );
     fflush ( fp );
-    std::string s;
-    std::stringstream ss;
-    ss << relativePath;
-    ss >> s;
-    if (verbosity>1) cout<<"\nSaved UintArray_2Columns file: "<< s <<"\n"<<std::flush;
+    if (verbosity>1) cout<<"\nSaved UintArray_2Columns file: "<< ss.str().c_str()  <<"\n"<<std::flush;
 }
 
-void FluidSystem::SaveUintArray_2D( uint* array, int numElem1, int numElem2, const char * relativePath ){ /// Used to save DESNSE_LIST_CHANGES (particle,bondIdx) arrays to .csv for debugging.
-   FILE* fp = fopen ( relativePath, "w" );
+void FluidSystem::SaveUintArray_2D( uint* array, int numElem1, int numElem2, const char * relativePath , float count ){ /// Used to save DESNSE_LIST_CHANGES (particle,bondIdx) arrays to .csv for debugging.
+    stringstream ss;
+    ss << launchParams.outPath << "/" << count<< relativePath;
+    FILE* fp = fopen ( ss.str().c_str()  , "w" );
     if (fp == NULL) {
         if (verbosity>1) std::cout << "\nvoid FluidSystem::SaveUintArray_2D ( const char * relativePath, int frame )  Could not open file "<< fp <<"\n"<< std::flush;
         assert(0);
@@ -1213,11 +1204,7 @@ void FluidSystem::SaveUintArray_2D( uint* array, int numElem1, int numElem2, con
     }
     fclose ( fp );
     fflush ( fp );
-    std::string s;
-    std::stringstream ss;
-    ss << relativePath;
-    ss >> s;  
-    if (verbosity>1) cout<<"\nSaved UintArray_2D file: "<< s <<"\n"<<std::flush;
+    if (verbosity>1) cout<<"\nSaved UintArray_2D file: "<< ss.str().c_str()  <<"\n"<<std::flush;
 }
 
 void FluidSystem::SavePointsVTP2 ( const char * relativePath, int frame ){// uses vtk library to write binary vtp files

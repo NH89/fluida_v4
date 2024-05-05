@@ -407,7 +407,7 @@ void FluidSystem::InsertParticlesCL(uint* gcell, uint* gndx, uint* gcnt) { //bin
         clReleaseMemObject(m_Fluid.mgpu[FBIN_COUNT]);
         clReleaseMemObject(m_Fluid.mgpu[FBIN_OFFSET]);
     }
-    if (verbosity > 0) {
+    if (verbosity > 2) {
         if (verbosity > 1)
             cout << "\nSaving (FGCELL) InsertParticlesCL: (particleIdx, cell) , mMaxPoints=" << mMaxPoints << "\t" << std::flush;
         status = clEnqueueReadBuffer(m_queue,
@@ -420,7 +420,7 @@ void FluidSystem::InsertParticlesCL(uint* gcell, uint* gndx, uint* gcnt) { //bin
                                   NULL,
                                   NULL);
         // TODO Has to be implemented again. CUCLCUCL
-        SaveUintArray(bufI(&m_Fluid, FGCELL), mMaxPoints, "InsertParticlesCL__bufI(&m_Fluid, FGCELL).csv");
+        SaveUintArray(bufI(&m_Fluid, FGCELL), mMaxPoints, "InsertParticlesCL__bufI(&m_Fluid, FGCELL).csv"  , m_Time);
     }
                                                                             if(verbosity>1) cout << "\n-----InsertParticlesCL finished-----\n\n" << flush;
 }
@@ -903,20 +903,18 @@ void FluidSystem::PrefixSumChangesCL ( int zero_offsets ){
     cl_mem array0  = gpuVar(&m_Fluid, FBIN_COUNT_CHANGES);
     cl_mem scan0   = gpuVar(&m_Fluid, FBIN_OFFSET_CHANGES);
 
-    if(m_debug>3){
+    if(launchParams.verbosity>0){
         // debug chk
         cout<<"\nSaving (FBIN_COUNT_CHANGES): (bin,#particles) , numElem1="<<numElem1<<"\t"<<std::flush;
         //clCheck( cuMemcpyDtoH ( bufI(&m_Fluid, FBIN_COUNT_CHANGES), gpuVar(&m_Fluid, FBIN_COUNT_CHANGES),	sizeof(uint[t_numElem1]) ), "PrefixSumChangesCL", "cuMemcpyDtoH", "FBIN_COUNT_CHANGES", mbDebug); // NUM_CHANGES*
         clCheck( clEnqueueReadBuffer(m_queue, gpuVar(&m_Fluid,FBIN_COUNT_CHANGES), CL_TRUE, 0, sizeof(uint[t_numElem1]), bufI(&m_Fluid, FBIN_COUNT_CHANGES), 0, NULL, NULL),    "PrefixSumChangesCL","clEnqueueReadBuffer","FBIN_COUNT_CHANGES",mbDebug);
-
         //### print to a csv file   AND do the same afterwards for FBIN_OFFSET_CHANGES ###
-        SaveUintArray( bufI(&m_Fluid, FBIN_COUNT_CHANGES), t_numElem1, "bufI(&m_Fluid, FBIN_COUNT_CHANGES).csv" );
+        SaveUintArray( bufI(&m_Fluid, FBIN_COUNT_CHANGES), t_numElem1, "bufI(&m_Fluid, FBIN_COUNT_CHANGES).csv" , m_Time);
         //
-        cout<<"\nSaving (FGCELL): (particleIdx, cell) , mMaxPoints="<<mMaxPoints<<"\t"<<std::flush;
         //clCheck( cuMemcpyDtoH ( bufI(&m_Fluid, FGCELL), gpuVar(&m_Fluid, FGCELL),	sizeof(uint[mMaxPoints]) ), "PrefixSumChangesCL", "cuMemcpyDtoH", "FGCELL", mbDebug);
         clCheck( clEnqueueReadBuffer(m_queue, gpuVar(&m_Fluid,FGCELL), CL_TRUE, 0, sizeof(uint[mMaxPoints]), bufI(&m_Fluid, FGCELL), 0, NULL, NULL),    "PrefixSumChangesCL","clEnqueueReadBuffer","FBIN_COUNT_CHANGES",mbDebug);
+        SaveUintArray( bufI(&m_Fluid, FGCELL), mMaxPoints, "bufI(&m_Fluid, FBIN_COUNT_CHANGES).csv" , m_Time);
 
-        SaveUintArray( bufI(&m_Fluid, FGCELL), mMaxPoints, "bufI(&m_Fluid, FGCELL).csv" );
         //
         //   clCheck( cuMemcpyDtoH ( bufI(&m_Fluid, FDENSE_LISTS), gpuVar(&m_Fluid, FDENSE_LISTS),	sizeof(uint[mMaxPoints]) ), "PrefixSumChangesCL", "cuMemcpyDtoH", "FDENSE_LISTS", mbDebug);
         //   SaveUintArray( bufI(&m_Fluid, FDENSE_LISTS), numElem1, "bufI(&m_Fluid, FDENSE_LISTS).csv" );
@@ -1385,19 +1383,19 @@ void FluidSystem::CountingSortFullCL ( cl_float3* ppos ){
 
         //clCheck( cuMemcpyDtoH ( bufI(&m_Fluid, FEPIGEN), gpuVar(&m_FluidTemp, FEPIGEN),	mMaxPoints *sizeof(uint[NUM_GENES]) ), "CountingSortFullCL8", "cuMemcpyDtoH", "FBIN_COUNT", mbDebug);
         clCheck( clEnqueueReadBuffer(m_queue, gpuVar(&m_FluidTemp, FEPIGEN), CL_TRUE, mMaxPoints *sizeof(uint[NUM_GENES]), sizeof(int), bufI(&m_Fluid, FEPIGEN), 0, NULL, NULL), "CountingSortFullCL8", "clEnqueueReadBuffer", "FBIN_COUNT", mbDebug);
-        SaveUintArray_2D( bufI(&m_Fluid, FEPIGEN), mMaxPoints, NUM_GENES, "CountingSortFullCL__m_FluidTemp.bufI(FEPIGEN)3.csv" );
+        SaveUintArray_2D( bufI(&m_Fluid, FEPIGEN), mMaxPoints, NUM_GENES,  "CountingSortFullCL__m_FluidTemp.bufI(FEPIGEN)3.csv" , m_Time);
 
         //clCheck( cuMemcpyDtoH ( bufI(&m_Fluid, FEPIGEN), gpuVar(&m_Fluid, FEPIGEN),	/*mMaxPoints*/mNumPoints *sizeof(uint[NUM_GENES]) ), "PrefixSumChangesCL", "cuMemcpyDtoH", "FBIN_COUNT", mbDebug);
         clCheck( clEnqueueReadBuffer(m_queue, gpuVar(&m_Fluid, FEPIGEN), CL_TRUE, mNumPoints *sizeof(uint[NUM_GENES]), sizeof(int), bufI(&m_Fluid, FEPIGEN), 0, NULL, NULL), "PrefixSumChangesCL", "clEnqueueReadBuffer", "FBIN_COUNT", mbDebug);
-        SaveUintArray_2D( bufI(&m_Fluid, FEPIGEN), mMaxPoints, NUM_GENES, "CountingSortFullCL__bufI(&m_Fluid, FEPIGEN)3.csv" );
+        SaveUintArray_2D( bufI(&m_Fluid, FEPIGEN), mMaxPoints, NUM_GENES,  "CountingSortFullCL__bufI(&m_Fluid, FEPIGEN)3.csv" , m_Time);
 
         //clCheck( cuMemcpyDtoH ( bufI(&m_Fluid, FBIN_COUNT), gpuVar(&m_Fluid, FBIN_COUNT),	sizeof(uint[m_GridTotal]) ), "CountingSortFullCL9", "cuMemcpyDtoH", "FBIN_COUNT", mbDebug);
         clCheck( clEnqueueReadBuffer(m_queue, gpuVar(&m_Fluid, FBIN_COUNT), CL_TRUE, sizeof(uint[m_GridTotal]), sizeof(int), bufI(&m_Fluid, FBIN_COUNT), 0, NULL, NULL), "PrefixSumChangesCL", "clEnqueueReadBuffer", "FBIN_COUNT", mbDebug);
-        SaveUintArray( bufI(&m_Fluid, FBIN_COUNT), m_GridTotal, "CountingSortFullCL__bufI(&m_Fluid, FBIN_COUNT).csv" );
+        SaveUintArray( bufI(&m_Fluid, FBIN_COUNT), m_GridTotal, "CountingSortFullCL__bufI(&m_Fluid, FBIN_COUNT).csv" , m_Time);
 
         //clCheck( cuMemcpyDtoH ( bufI(&m_Fluid, FBIN_OFFSET), gpuVar(&m_Fluid, FBIN_OFFSET),	sizeof(uint[m_GridTotal]) ), "CountingSortFullCL10", "cuMemcpyDtoH", "FBIN_OFFSET", mbDebug);
         clCheck( clEnqueueReadBuffer(m_queue, gpuVar(&m_Fluid, FBIN_OFFSET), CL_TRUE, sizeof(uint[m_GridTotal] ), sizeof(int), bufI(&m_Fluid, FBIN_OFFSET), 0, NULL, NULL), "PrefixSumChangesCL", "clEnqueueReadBuffer", "FBIN_COUNT", mbDebug);
-        SaveUintArray( bufI(&m_Fluid, FBIN_OFFSET), m_GridTotal, "CountingSortFullCL__bufI(&m_Fluid, FBIN_OFFSET).csv" );
+        SaveUintArray( bufI(&m_Fluid, FBIN_OFFSET), m_GridTotal, "CountingSortFullCL__bufI(&m_Fluid, FBIN_OFFSET).csv" , m_Time);
 
        // uint fDenseList2[100000];
        // cl_device_idptr*  _list2pointer = (cl_device_idptr*) &bufC(&m_Fluid, FDENSE_LISTS)[2 * sizeof(cl_device_idptr)];
@@ -1510,7 +1508,7 @@ void FluidSystem::CountingSortChangesCL ( ){
 
             char filename[256];
             sprintf(filename, "CountingSortChangesCL__m_Fluid.bufII(FDENSE_LISTS_CHANGES)[%d].csv", change_list);
-            SaveUintArray_2Columns(fDenseList2, denselist_len, densebuff_len, filename);
+            SaveUintArray_2Columns(fDenseList2, denselist_len, densebuff_len, filename, m_Time);
             printf("\n\nlist2buffer=%p", list2buffer);
         }
     }

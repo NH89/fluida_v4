@@ -651,9 +651,10 @@ using namespace std;
 		void EmitParticlesCL ( float time, int cnt );
         
 		// I/O Files
-        void SaveUintArray( uint* array, int numElem1, const char * relativePath );
-        void SaveUintArray_2Columns( uint* array, int numElem1, int buff_len, const char * relativePath ); /// Used to save DESNSE_LIST_CHANGES (particle,bondIdx) arrays to .csv for debugging.
-        void SaveUintArray_2D ( uint* array, int numElem1, int numElem2, const char * relativePath );
+        void SaveUintArray( uint* array, int numElem1, const char * relativePath, float count=0 );
+		//void SaveUintArray( uint* array, int numElem1, stringstream /*const char * */  relativePath );
+        void SaveUintArray_2Columns( uint* array, int numElem1, int buff_len, const char * relativePath , float count=0 ); /// Used to save DESNSE_LIST_CHANGES (particle,bondIdx) arrays to .csv for debugging.
+        void SaveUintArray_2D ( uint* array, int numElem1, int numElem2, const char * relativePath , float count=0 );
         
         void SavePointsVTP2 ( const char * relativePath, int frame );
         void SavePointsCSV2 ( const char * relativePath, int frame );
