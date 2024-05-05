@@ -174,3 +174,7 @@ _deps
 ./old-*
 *.kdev4
 src/build/*
+
+old-build*
+old-data*
+src/.make_demo2.cpp.kate-swp
