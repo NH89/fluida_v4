@@ -101,7 +101,9 @@ Within Non-Reciprocal branch executables (so far) include:
 
 This is the main way of launching for testing. It reads a file called SpecificationFile.txt in the "demo" directory. 
 
-usage:
+NB Ideally run from the "data/" directory containing the "demo/" and "out/" directories. 
+
+usage: 
     
     make_demo2 <input_folder> <output_folder>
 

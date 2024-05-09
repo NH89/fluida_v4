@@ -33,6 +33,7 @@
 	#include <curand_kernel.h>
 	#include <stdio.h>
 	#include <math.h>
+	#include <cuda/std/limits>
     //#include "/usr/local/cuda/include/math_constants.h"  // need better <path> . In CMakeLists.txt "include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})"
 
 	#define CUDA_KERNEL

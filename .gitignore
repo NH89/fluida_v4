@@ -172,11 +172,12 @@ _deps
 
 # End of https://www.toptal.com/developers/gitignore/api/cmake,clion,cuda,c++
 
-/build/
-/data/check/
-/data/demo/
-/data/test/
-/Debug/
+build/
+data/
+data/check/
+data/demo/
+data/test/
+Debug/
 ./old-*
 *.kdev4
 src/build/*

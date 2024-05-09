@@ -1,12 +1,7 @@
 #!/bin/bash
-
-FOLDER=($HOME/Programming/Cuda/Morphogenesis/data/demo_batch/demo_intstiff*.000000/)
-
-while(${FOLDER[ITERATOR]} != NULL)
+# Change folder selection string as needed.
+for file in $HOME/Programming/Cuda/Morphogenesis/data/demo_batch/demo_intstiff*.*00/
 do
-echo ${FOLDER[ITERATOR]}
-make_demo2 ${FOLDER[ITERATOR]} ${FOLDER[ITERATOR]}
-ITERATOR++
+    echo $file
+    make_demo2 $file $file
 done
-
-# bad syntax, correct to make valid bash script.
