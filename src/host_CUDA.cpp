@@ -636,6 +636,10 @@ void FluidSystem::ComputeForceCUDA (){
     //if (m_FParams.debug>1)printf("\n\nFluidSystem::ComputeForceCUDA (),  m_FParams.freeze=%s",(m_FParams.freeze==true) ? "true" : "false");
     void* args[3] = { &m_FParams.pnumActive ,  &m_FParams.freeze, &m_FParams.frame};
     cuCheck ( cuLaunchKernel ( m_Func[FUNC_COMPUTE_FORCE],  m_FParams.numBlocks, 1, 1, m_FParams.numThreads, 1, 1, 0, NULL, args, NULL), "ComputeForceCUDA", "cuLaunch", "FUNC_COMPUTE_FORCE", mbDebug);
+    if(m_FParams.debug>0){
+        cuCheck( cuMemcpyDtoH ( m_Fluid.bufF3(FFORCE), m_Fluid.gpu(FFORCE),	sizeof(float3[mMaxPoints]) ), "ComputeForceCUDA", "cuMemcpyDtoH", "FFORCE", mbDebug);
+        SaveFloat3Array( m_Fluid.bufF3(FFORCE), mMaxPoints, "ComputeForceCUDA__m_Fluid.bufI(FFORCE)3" );
+    }
 }
 
 void FluidSystem::ComputeGenesCUDA (){  // for each gene, call a kernel wih the dese list for that gene
@@ -815,8 +819,10 @@ void FluidSystem::TransferPosVelVevalFromTemp (){
 
 void FluidSystem::ZeroVelCUDA (){                                       // Used to remove velocity, kinetic energy and momentum during initialization.
     cuCheck(cuCtxSynchronize(), "Run", "cuCtxSynchronize", "After freeze Run2PhysicalSort ", mbDebug);
-    cuCheck ( cuMemsetD32 ( m_Fluid.gpu(FVEL),   0.0,  mMaxPoints ),  "ZeroVelCUDA", "cuMemsetD32", "FVEL",        mbDebug);
-    cuCheck ( cuMemsetD32 ( m_Fluid.gpu(FVEVAL), 0.0,  mMaxPoints ),  "ZeroVelCUDA", "cuMemsetD32", "FVEVAL",      mbDebug);
+    cuCheck ( cuMemsetD32 ( m_Fluid.gpu(FVEL),          0.0,  mMaxPoints ),  "ZeroVelCUDA", "cuMemsetD32", "FVEL",        mbDebug);
+    cuCheck ( cuMemsetD32 ( m_Fluid.gpu(FVEVAL),        0.0,  mMaxPoints ),  "ZeroVelCUDA", "cuMemsetD32", "FVEVAL",      mbDebug);
+    cuCheck ( cuMemsetD32 ( m_FluidTemp.gpu(FVEL),      0.0,  mMaxPoints ),  "ZeroVelCUDA", "cuMemsetD32", "FVEL",        mbDebug);
+    cuCheck ( cuMemsetD32 ( m_FluidTemp.gpu(FVEVAL),    0.0,  mMaxPoints ),  "ZeroVelCUDA", "cuMemsetD32", "FVEVAL",      mbDebug);
     cuCheck(cuCtxSynchronize(), "Run", "cuCtxSynchronize", "After freeze ZeroVelCUDA ", mbDebug);
 }
 

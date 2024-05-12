@@ -284,6 +284,7 @@
         void SaveUintArray( uint* array, int numElem1, const char * relativePath );
         void SaveUintArray_2Columns( uint* array, int numElem1, int buff_len, const char * relativePath ); /// Used to save DESNSE_LIST_CHANGES (particle,bondIdx) arrays to .csv for debugging.
         void SaveUintArray_2D ( uint* array, int numElem1, int numElem2, const char * relativePath );
+		void SaveFloat3Array( float3* array, int numElem1, const char * relativePath );
         
         void SavePointsVTP2 ( const char * relativePath, int frame );
         void SavePointsCSV2 ( const char * relativePath, int frame );
