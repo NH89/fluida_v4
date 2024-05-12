@@ -555,17 +555,21 @@ void FluidSystem::SetupAddVolumeMorphogenesis2(Vector3DF min, Vector3DF max, flo
 if (m_FParams.debug>1)std::cout << "\n SetupAddVolumeMorphogenesis2 \t" << std::flush ;
     Vector3DF pos;
     float dx, dy, dz;
-    int cntx, cntz, p, c2;
-    cntx = (int) ceil( (max.x-min.x-offs) / spacing );
-    cntz = (int) ceil( (max.z-min.z-offs) / spacing );
-    int cnt = cntx * cntz;
+    int p;
+    /*
+    //cntx, cntz, c2;
+    //cntx = (int) ceil( (max.x-min.x-offs) / spacing );
+    //cntz = (int) ceil( (max.z-min.z-offs) / spacing );
+    //int cnt = cntx * cntz;
+    //c2 = cnt/2;
+    //Vector3DF rnd;
+    */
     min += offs;            // NB by default offs=0.1f, & min=m_Vec[PINITMIN], when called in WriteDemoSimParams(..)
     max -= offs;            // m_Vec[PINITMIN] is set in SetupExampleParams()
     dx = max.x-min.x;       // m_Vec[PBOUNDMIN] is set in SetupSpacing 
     dy = max.y-min.y;
     dz = max.z-min.z;
-    Vector3DF rnd;
-    c2 = cnt/2;
+
     Vector3DF Pos, Vel; 
     uint Age, Clr, Particle_ID, Mass_Radius, NerveIdx;
     uint  ElastIdxU[BOND_DATA];
@@ -573,10 +577,12 @@ if (m_FParams.debug>1)std::cout << "\n SetupAddVolumeMorphogenesis2 \t" << std::
     uint Particle_Idx[BONDS_PER_PARTICLE*2]; // FPARTICLE_IDX : other particles with incoming bonds attaching here. 
     float Conc[NUM_TF];
     uint EpiGen[NUM_GENES]={0};
-    Particle_ID = 0;                         // NB Particle_ID=0 means "no particle" in ElastIdx.           
+    Particle_ID = 0;                         // NB Particle_ID=0 means "no particle" in ElastIdx.
+
     Vector3DF volV3DF = max-min;    
     int num_particles_to_make = 8 * int(volV3DF.x*volV3DF.y*volV3DF.z);// 27 * //int(volV3DF.x*volV3DF.y*volV3DF.z / spacing*spacing*spacing);
     srand((unsigned int)time(NULL));
+
     if (m_FParams.debug>1)cout<<"\nSetupAddVolumeMorphogenesis2: num_particles_to_make="<<num_particles_to_make<<",   min=("<<min.x<<","<<min.y<<","<<min.z<<"), max=("<<max.x<<","<<max.y<<","<<max.z<<") "<<std::flush;
     for (int i=0; i<num_particles_to_make; i++){
         Pos.x =  min.x + (float(rand())/float((RAND_MAX)) * dx) ;
@@ -592,13 +598,14 @@ if (m_FParams.debug>1)std::cout << "\n SetupAddVolumeMorphogenesis2 \t" << std::
                 clr += 0.2;
                 clr.Clamp (0, 1.0);
                 Clr = COLORA( clr.x, clr.y, clr.z, 1);
+            /*
                 // Modulus & length of elastic bonds
                 // 8bits log modulus + 24bit uid, with fixed length // but for now 16bit modulus and radius
-                uint modulus, length, mod_len;
-                modulus = uint(m_Param [ PINTSTIFF ]) ; // m_Param [ PINTSTIFF ] =		1.0f;
-                length = uint(1000 * m_Param [ PSMOOTHRADIUS ]); // m_Param [ PSMOOTHRADIUS ] =	0.015f;	// m // related to spacing, but also max particle range i.e. ....
-                mod_len = ( modulus <<16 | length ); // NB should mask length to prevent it exceeding 16bits, i.e. 255*255
-                
+            //    uint modulus, length, mod_len;
+            //    modulus = uint(m_Param [ PINTSTIFF ]) ; // m_Param [ PINTSTIFF ] =		1.0f;
+            //    length = uint(1000 * m_Param [ PSMOOTHRADIUS ]); // m_Param [ PSMOOTHRADIUS ] =	0.015f;	// m // related to spacing, but also max particle range i.e. ....
+            //    mod_len = ( modulus <<16 | length ); // NB should mask length to prevent it exceeding 16bits, i.e. 255*255
+             */
                 for (int i = 0; i<BONDS_PER_PARTICLE;i++){ 
                     for (int j = 0; j< DATA_PER_BOND; j++){ ElastIdxU[i*DATA_PER_BOND +j] = UINT_MAX; ElastIdxF[i*DATA_PER_BOND +j] = 0; } 
                     ElastIdxU[i*DATA_PER_BOND +8] = 0;
@@ -1146,29 +1153,29 @@ void FluidSystem::SetupDefaultParams (){
     // draining the system from energy as intended."
     //    Actual visocity of water = 0.001 Pa.s    // viscosity of water at 20 deg C.
 
-    m_Time = 0.0f;							// Start at T=0
+    m_Time = 0.0f;							        // Start at T=0
     m_DT = 0.003f;
 
-    m_Param [ PSIMSCALE ] =		0.005f;			// unit size
-    m_Param [ PVISC ] =			0.50f;			// pascal-second (Pa.s) = 1 kg m^-1 s^-1  (see wikipedia page on viscosity)
-    m_Param [ PSURFACE_TENSION ] = 0.1f;
-    m_Param [ PRESTDENSITY ] =	400.0f;			// kg / m^3
-    m_Param [ PSPACING ]	=	0.0f;			// spacing will be computed automatically from density in most examples (set to 0 for autocompute)
-    m_Param [ PMASS ] =			0.00020543f;		// kg
-    m_Param [ PRADIUS ] =		0.015f;			// m
-    m_Param [ PDIST ] =			0.0059f;			// m
-    m_Param [ PSMOOTHRADIUS ] =	0.015f;			// m
-    m_Param [ PINTSTIFF ] =		1.0f;
-    m_Param [ PEXTSTIFF ] =		50000.0f;
-    m_Param [ PEXTDAMP ] =		100.0f;
-    m_Param [ PACCEL_LIMIT ] =	150.0f;			// m / s^2
-    m_Param [ PVEL_LIMIT ] =	3.0f;			// m / s
-    m_Param [ PGRAV ] =			1.0f;
+    m_Param [ PSIMSCALE ]           = 0.005f;		// unit size
+    m_Param [ PVISC ]               = 0.50f;		// pascal-second (Pa.s) = 1 kg m^-1 s^-1  (see wikipedia page on viscosity)
+    m_Param [ PSURFACE_TENSION ]    = 0.1f;
+    m_Param [ PRESTDENSITY ]        = 400.0f;		// kg / m^3
+    m_Param [ PSPACING ]            = 0.0f;			// spacing will be computed automatically from density in most examples (set to 0 for autocompute)
+    m_Param [ PMASS ]               = 0.00020543f;	// kg
+    m_Param [ PRADIUS ]             = 0.015f;		// m
+    m_Param [ PDIST ]               = 0.0059f;		// m
+    m_Param [ PSMOOTHRADIUS ]       = 0.015f;		// m
+    m_Param [ PINTSTIFF ]           = 1.0f;
+    m_Param [ PEXTSTIFF ]           = 50000.0f;
+    m_Param [ PEXTDAMP ]            = 100.0f;
+    m_Param [ PACCEL_LIMIT ]        = 150.0f;		// m / s^2
+    m_Param [ PVEL_LIMIT ]          = 3.0f;			// m / s
+    m_Param [ PGRAV ]               = 1.0f;
 
-    m_Param [ PGROUND_SLOPE ] = 0.0f;
-    m_Param [ PFORCE_MIN ] =	0.0f;
-    m_Param [ PFORCE_MAX ] =	0.0f;
-    m_Param [ PFORCE_FREQ ] =	16.0f;
+    m_Param [ PGROUND_SLOPE ]       = 0.0f;
+    m_Param [ PFORCE_MIN ]          = 0.0f;
+    m_Param [ PFORCE_MAX ]          = 0.0f;
+    m_Param [ PFORCE_FREQ ]         = 16.0f;
     m_Vec [ PPLANE_GRAV_DIR ].Set ( 0, -9.8f, 0 );
 
     // Default sim config

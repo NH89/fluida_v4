@@ -4,6 +4,7 @@
 #include <string.h>
 #include <chrono>
 #include <filesystem>
+#include <iostream>
 
 #include "fluid_system.h"
 
@@ -19,8 +20,13 @@ int main ( int argc, const char** argv )
         \nIf output_folder is not given the value from SpecificationFile.txt will be used.\n" );
         return 0;
     } else {
+        auto now = std::chrono::system_clock::now();
+        auto in_time_t = std::chrono::system_clock::to_time_t(now);
+        std::stringstream datetime;
+        datetime << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d %X");
+        //std::ofstream myFile2("report_" + datetime.str() + ".csv");
         sprintf ( input_folder, "%s", argv[1] );
-        sprintf ( output_folder, "%s", argv[2] );
+        sprintf ( output_folder, "%s_%s", argv[2], datetime.str().c_str() );                // Add timestamp to output folder name.
         printf ( "input_folder = %s , output_folder = %s\n", input_folder, output_folder );
     }
 cout << "\nmake_demo2: chk_1 "<<std::flush;
