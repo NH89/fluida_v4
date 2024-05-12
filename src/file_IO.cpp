@@ -1555,3 +1555,20 @@ void FluidSystem::SaveUintArray_2D( uint* array, int numElem1, int numElem2, con
     if (m_FParams.debug>1) cout<<"\nSaved UintArray_2D file: "<< s <<"\n"<<std::flush;
 }
 
+void FluidSystem::SaveFloat3Array( float3* array, int numElem1, const char * relativePath ){ /// Used to save an array to .csv for debugging.
+    std::stringstream ss;
+    ss << launchParams.outPath << "/" << relativePath << "_" << m_Debug_file << ".csv";
+
+    FILE* fp = fopen ( ss.str().c_str(), "w" );
+    if (fp == NULL) {
+        if (m_FParams.debug>1) std::cout << "\nvoid FluidSystem::SaveFloat3Array(..) Could not open file "<< fp <<"\n"<< std::flush;
+        assert(0);
+    }
+    for(uint i=0; i<numElem1; i+=100){
+        fprintf(fp, "\n");
+        for(uint j=0;j<100 && i+j<numElem1;j+=3) fprintf(fp, ",%u,%f,%f,%f,",i+j,array[i+j].x, array[i+j].y, array[i+j].z);
+    }
+    fclose ( fp );
+    fflush ( fp );
+    if (m_FParams.debug>0) cout<<"\nSaved UintArray file: "<< ss.str() <<"\n"<<std::flush;
+}

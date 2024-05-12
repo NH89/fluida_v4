@@ -623,9 +623,9 @@ if (m_FParams.debug>1)std::cout << "\n SetupAddVolumeMorphogenesis2 \t" << std::
                 for (int i=0; i< NUM_TF; i++)    { Conc[i]   = 0 ;}     // morphogen & transcription factor concentrations
                 for (int i=0; i< NUM_GENES; i++) { EpiGen[i] = 0 ;}     // epigenetic state of each gene in this particle
                 uint fixedActive = INT_MAX;                             // FEPIGEN below INT_MAX will count down to inactivation. Count down is inactivated by adding INT_MAX.
-                EpiGen[0] = fixedActive;                                        // active, i.e. not reserve
-                EpiGen[1] = fixedActive;                                        // solid, i.e. have elastic bonds
-                EpiGen[2] = fixedActive;                                        // living/telomere, i.e. has genes
+                EpiGen[0] = fixedActive;                                                                // active, i.e. not reserve
+                if (demoType == 0){  EpiGen[1] = 0; } else { EpiGen[1] = fixedActive; }                 // solid, i.e. have elastic bonds
+                EpiGen[2] = fixedActive;                                                                // living/telomere, i.e. has genes
                 
                 if(demoType == 1){                                                                    ////// Remodelling & actuation demo
                                                                                 // Fixed base, bone, tendon, muscle, elastic, external actuation
@@ -642,6 +642,8 @@ if (m_FParams.debug>1)std::cout << "\n SetupAddVolumeMorphogenesis2 \t" << std::
                     EpiGen[2]=1;                                            // living particle NB set gene behaviour
                 }                                                           // => (i) French flag, (ii) polartity, (iii) clock & wave front
                 
+
+
                 p = AddParticleMorphogenesis2 (
                 /* Vector3DF* */ &Pos, 
                 /* Vector3DF* */ &Vel, 
@@ -1633,6 +1635,7 @@ void FluidSystem::Run2Simulation(){
             for (int k=0; k<launchParams.steps_per_InnerPhysicalLoop; k++) {
                 std::cout<<"\tk="<<k;
                 Run2InnerPhysicalLoop();                                                                    // Run2InnerPhysicalLoop();
+                ZeroVelCUDA ();
             }
             if(launchParams.gene_activity=='y') Run2GeneAction();                                           // Run2GeneAction();
             if(launchParams.remodelling=='y') Run2Remodelling(launchParams.steps_per_InnerPhysicalLoop);                                          // Run2Remodelling();

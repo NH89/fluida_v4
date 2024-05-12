@@ -1974,7 +1974,8 @@ extern "C" __global__ void initialize_bonds (int ActivePoints, uint list_length,
     }
     // from saveVTP() host code
     unsigned int tissueType;                                   // bond_type: 0=elastin, 1=collagen, 2=apatite
-    if      (fbufFEPIGEN[9*fparam.maxPoints]>0/*bone*/)       {tissueType =9;   bond_type[0]=2; bond_type[1]=2; bond_type[2]=2; bond_type[3]=2; }                                          
+    if      (fbufFEPIGEN[1*fparam.maxPoints]==0/*fluid*/)     return;
+    else if (fbufFEPIGEN[9*fparam.maxPoints]>0/*bone*/)       {tissueType =9;   bond_type[0]=2; bond_type[1]=2; bond_type[2]=2; bond_type[3]=2; }
     else if (fbufFEPIGEN[6*fparam.maxPoints]>0/*tendon*/)     {tissueType =6;   bond_type[0]=1; bond_type[1]=0; bond_type[2]=0; bond_type[3]=0; } 
     else if (fbufFEPIGEN[7*fparam.maxPoints]>0/*muscle*/)     {tissueType =7;   bond_type[0]=1; bond_type[1]=0; bond_type[2]=0; bond_type[3]=0; } 
     else if (fbufFEPIGEN[10*fparam.maxPoints]>0/*elast lig*/) {tissueType =10;  bond_type[0]=1; bond_type[1]=0; bond_type[2]=0; bond_type[3]=0; } 
@@ -3222,7 +3223,7 @@ extern "C" __global__ void computeForce ( int pnum, bool freeze, uint frame)
         bond_dsq[a]= fparam.rd2;                                                    // NB if ( dsq < fparam.rd2 && dsq > 0) is the cut off for fluid interaction range
     } 
     uint i_ID = fbuf.bufI(FPARTICLE_ID)[i];
-    //if(fbuf.bufI(FPARTICLE_ID)[i]<10) printf("\ncomputeForce() chk2: ParticleID=%u  ",fbuf.bufI(FPARTICLE_ID)[i] );  
+    //if(fbuf.bufI(FPARTICLE_ID)[i]<10) printf("\ncomputeForce() chk2: ParticleID=%u  ",fbuf.bufI(FPARTICLE_ID)[i] );
     //__syncthreads();
     
     float3  pvel = {fbuf.bufF3(FVEVAL)[ i ].x,  fbuf.bufF3(FVEVAL)[ i ].y,  fbuf.bufF3(FVEVAL)[ i ].z}; // copy i's FEVAL to thread memory
@@ -3309,7 +3310,7 @@ extern "C" __global__ void computeForce ( int pnum, bool freeze, uint frame)
         fluid_force_sum += fluid_force;
     }
     force += fluid_force_sum * fparam.pmass ; // now  force is accel.... 
-    if(fparam.debug >0  && long_bonds==true /*i==uint(pnum/2)*/ /* && fbuf.bufF(FEPIGEN)[i +  12*fparam.maxPoints]*/ ) {                              // if "external actuation" particle
+    if(fparam.debug >0  /*&& long_bonds==true*/ /*i==uint(pnum/2)*/ /* && fbuf.bufF(FEPIGEN)[i +  12*fparam.maxPoints]*/ ) {                              // if "external actuation" particle
         fluid_force_sum *= fparam.pmass;
         printf("\nComputeForce 2: i=,%u,   fluid_force_sum=(,\t%f,\t%f,\t%f,\t) \n\t\t\t force=(,\t%f,\t%f,\t%f,\t) ", 
                i, fluid_force_sum.x, fluid_force_sum.y, fluid_force_sum.z,   force.x, force.y, force.z );
@@ -3317,6 +3318,7 @@ extern "C" __global__ void computeForce ( int pnum, bool freeze, uint frame)
     //printf(".\n");
     //__syncthreads();
     //if (fparam.debug>2)printf("\ni=%u, bond_dsq=(%f,%f,%f,%f,%f,%f),",i,bond_dsq[0],bond_dsq[1],bond_dsq[2],bond_dsq[3],bond_dsq[4],bond_dsq[5]);
+
 
 	//__syncthreads();   // when is this needed ? ############
     atomicAdd(&fbuf.bufF3(FFORCE)[ i ].x, force.x);                                 // atomicAdd req due to other particles contributing forces via incomming bonds. 
