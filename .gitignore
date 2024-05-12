@@ -185,3 +185,9 @@ src/build/*
 old-build*
 old-data*
 src/.make_demo2.cpp.kate-swp
+
+.ipynb_checkpoints/*
+.project
+doxygen/*
+old/*
+
