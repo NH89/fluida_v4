@@ -43,19 +43,22 @@
 	#include <math.h>
 	#include <sys/stat.h>
     #include <sys/types.h> 
+    
+	//#define VTK_VERSION 9.3
+	//#define VTK(sub_lib)  <vtk-VTK_VERSION/sub_lib>
 	
-	#include <vtk-9.2/vtkCellArray.h>
-    #include <vtk-9.2/vtkPoints.h>
-    #include <vtk-9.2/vtkXMLPolyDataWriter.h>
-    #include <vtk-9.2/vtkPolyData.h>
-    #include <vtk-9.2/vtkSmartPointer.h>
-    #include <vtk-9.2/vtkLine.h>
-    #include <vtk-9.2/vtkDataSet.h>
-    #include <vtk-9.2/vtkUnsignedIntArray.h>
-    #include <vtk-9.2/vtkUnsignedCharArray.h>
-    #include <vtk-9.2/vtkFloatArray.h>
-    #include <vtk-9.2/vtkPointData.h>
-    #include <vtk-9.2/vtkCellData.h>
+	#include <vtk/vtkCellArray.h>
+    #include <vtk/vtkPoints.h>
+    #include <vtk/vtkXMLPolyDataWriter.h>
+    #include <vtk/vtkPolyData.h>
+    #include <vtk/vtkSmartPointer.h>
+    #include <vtk/vtkLine.h>
+    #include <vtk/vtkDataSet.h>
+    #include <vtk/vtkUnsignedIntArray.h>
+    #include <vtk/vtkUnsignedCharArray.h>
+    #include <vtk/vtkFloatArray.h>
+    #include <vtk/vtkPointData.h>
+    #include <vtk/vtkCellData.h>
 	#include "fluid.h"
 	
 	extern bool gProfileRend;
