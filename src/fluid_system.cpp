@@ -1105,7 +1105,7 @@ void FluidSystem::SetupGrid ( Vector3DF min, Vector3DF max, float sim_scale, flo
         for (int z=0; z < m_GridSrch; z++ )
             for (int x=0; x < m_GridSrch; x++ )
                 m_GridAdj[cell++] = ( y*m_GridRes.z + z )*m_GridRes.x +  x ;			// -1 compensates for ndx 0=empty
-
+                // Gives grid increments from start cell, for each of the adjacent cell wrt centre cell. NB will wrap at boundaries of sim space.
     if ( mPackGrid != 0x0 ) free ( mPackGrid );
     mPackGrid = (int*) malloc ( sizeof(int) * m_GridTotal );
 }

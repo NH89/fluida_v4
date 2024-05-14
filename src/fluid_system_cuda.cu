@@ -72,7 +72,7 @@ extern "C" __global__ void insertParticles ( int pnum )                         
 	gc = make_int3( int(gcf.x), int(gcf.y), int(gcf.z) );                        // crops to an int3
 	gs = (gc.y * gridRes.z + gc.z)*gridRes.x + gc.x;                             // linearizes to an int for a 1D array of bins
 	
-if(fparam.debug>1 && i==pnum-1) printf("\n\ninsertParticles()1: gridTot=%i,  i=%u: gc.x=%i, gc.y=%i, gc.z=%i, gs=%i \t gridScan.x=%i, gridScan.y=%i, gridScan.z=%i, gridTot=%u,\t gridDelta=(%f,%f,%f) gridMin=(%f,%f,%f) gridRes=(%i,%i,%i)", 
+if(fparam.debug>1 && i==pnum-1) printf("\n\ninsertParticles()1: gridTot=%i,  i=%u: gc.x=%i, gc.y=%i, gc.z=%i, gs=%i \t gridScan.x=%i, gridScan.y=%i, gridScan.z=%i, gridTot=%u,\t gridDelta=(%f,%f,%f) gridMin=(%f,%f,%f) gridRes=(%i,%i,%i)",
     gridTot, i, gc.x, gc.y, gc.z, gs,  gridScan.x, gridScan.y, gridScan.z, gridTot, gridDelta.x, gridDelta.y, gridDelta.z,  gridMin.x, gridMin.y, gridMin.z, gridRes.x, gridRes.y, gridRes.z );
 
 	if ( gc.x >= 1 && gc.x <= gridScan.x && gc.y >= 1 && gc.y <= gridScan.y && gc.z >= 1 && gc.z <= gridScan.z ) {
@@ -601,7 +601,10 @@ extern "C" __device__ float contributePressure ( int i, float3 p, int cell, floa
 		int pndx = fbuf.bufI(FGRID) [cndx];                                 // index of this particle
 		dist = p - fbuf.bufF3(FPOS) [pndx];                                 // float3 distance between this particle, and the particle for which the loop has been called.
 		dsq = (dist.x*dist.x + dist.y*dist.y + dist.z*dist.z);              // scalar distance squared
-        
+
+        //printf("\nkernel contributePressure: i=%u, cell=%u, cndx=%u, pndx=%u, dsq=%f, (dsq < r2)=%u , r2=%f, gridsize=%f,%f,%f",
+        //       i,cell,cndx,pndx,dsq, (dsq < r2), r2,  fparam.gridSize.x, fparam.gridSize.y, fparam.gridSize.z);
+
         // From https://github.com/DualSPHysics/DualSPHysics/wiki/3.-SPH-formulation#31-smoothing-kernel 
         /*
          * q=r/h, where r=dist between particles, h=smoothing length
@@ -648,7 +651,8 @@ extern "C" __global__ void computePressure ( int pnum )
 	float3 pos = fbuf.bufF3(FPOS) [i];
 	float sum = 0.0, sum_p6k = 0.0;
 	for (int c=0; c < fparam.gridAdjCnt; c++) {                                    
-		sum += contributePressure ( i, pos, gc + fparam.gridAdj[c], sum_p6k );
+		sum += contributePressure ( i, pos, gc + fparam.gridAdj[c], sum_p6k );    // NB will wrap at boundaries of sim space.
+        //printf("\nkernel computePressure: i = %u ,  fparam.gridAdjCnt = %u ,  fparam.gridAdj[c] = %u", i, fparam.gridAdjCnt, fparam.gridAdj[c]  );
 	}
 	__syncthreads();
     
@@ -3312,8 +3316,8 @@ extern "C" __global__ void computeForce ( int pnum, bool freeze, uint frame)
     force += fluid_force_sum * fparam.pmass ; // now  force is accel.... 
     if(fparam.debug >0  /*&& long_bonds==true*/ /*i==uint(pnum/2)*/ /* && fbuf.bufF(FEPIGEN)[i +  12*fparam.maxPoints]*/ ) {                              // if "external actuation" particle
         fluid_force_sum *= fparam.pmass;
-        printf("\nComputeForce 2: i=,%u,   fluid_force_sum=(,\t%f,\t%f,\t%f,\t) \n\t\t\t force=(,\t%f,\t%f,\t%f,\t) ", 
-               i, fluid_force_sum.x, fluid_force_sum.y, fluid_force_sum.z,   force.x, force.y, force.z );
+        //printf("\nComputeForce 2: i=,%u,   fluid_force_sum=(,\t%f,\t%f,\t%f,\t) \n\t\t\t force=(,\t%f,\t%f,\t%f,\t) ",
+        //       i, fluid_force_sum.x, fluid_force_sum.y, fluid_force_sum.z,   force.x, force.y, force.z );
     }
     //printf(".\n");
     //__syncthreads();
