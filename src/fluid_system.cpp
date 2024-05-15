@@ -45,7 +45,7 @@ bool cuCheck (CUresult launch_stat, const char* method, const char* apicall, con
 }
 //////////////////////////////////////////////////
 FluidSystem::FluidSystem (){
-    if (m_FParams.debug>1)cout<<"\n\nFluidSystem ()"<<std::flush;
+    cout<<"\n\nFluidSystem ()"<<std::flush;
     memset ( &m_Fluid, 0,		sizeof(FBufs) );
     memset ( &m_FluidTemp, 0,	sizeof(FBufs) );
     memset ( &m_FParams, 0,		sizeof(FParams) );
@@ -55,6 +55,7 @@ FluidSystem::FluidSystem (){
     mPackGrid = 0x0;
     m_Frame = 0;
     for (int n=0; n < FUNC_MAX; n++ ) m_Func[n] = (CUfunction) -1;
+    cout<<"\n\nFluidSystem () finished"<<std::flush;
 }
 
 bool FluidSystem::cuCheck (CUresult launch_stat, const char* method, const char* apicall, const char* arg, bool bDebug){
@@ -120,7 +121,7 @@ void FluidSystem::Initialize (){             // used for CPU only for "check_dem
 // /home/nick/Programming/Cuda/Morphogenesis/build/install/ptx/objects/fluid_systemPTX/fluid_system_cuda.ptx
 void FluidSystem::InitializeCuda (){         // used for load_sim  /home/nick/Programming/Cuda/Morphogenesis/build/install/ptx/objects-Debug/fluid_systemPTX/fluid_system_cuda.ptx
 cout << "\nFluidSystem::InitializeCuda : chk_1 "<<std::flush;
-    if (m_FParams.debug>1)std::cout << "FluidSystem::InitializeCuda () \n";
+    //if (m_FParams.debug>1)std::cout << "FluidSystem::InitializeCuda () \n";
     char* morphogenesis_ptx = std::getenv("MORPHOGENESIS_HOME");
 
 cout << "\nFluidSystem::InitializeCuda : chk_1.1 morphogenesis_ptx : "<< morphogenesis_ptx<< std::flush;
@@ -1085,8 +1086,8 @@ void FluidSystem::SetupGrid ( Vector3DF min, Vector3DF max, float sim_scale, flo
     m_GridSize.x = m_GridRes.x * cell_size / sim_scale;				// Adjust grid size to multiple of cell size
     m_GridSize.y = m_GridRes.y * cell_size / sim_scale;
     m_GridSize.z = m_GridRes.z * cell_size / sim_scale;
-    m_GridDelta = m_GridRes;		// delta = translate from world space to cell #
-    m_GridDelta /= m_GridSize;
+    m_GridDelta = m_GridRes;	m_GridDelta /= m_GridSize;	        // delta = translate from world space to cell #
+
     m_GridTotal = (int)(m_GridRes.x * m_GridRes.y * m_GridRes.z);
 
     // Number of cells to search:
@@ -1108,6 +1109,22 @@ void FluidSystem::SetupGrid ( Vector3DF min, Vector3DF max, float sim_scale, flo
                 // Gives grid increments from start cell, for each of the adjacent cell wrt centre cell. NB will wrap at boundaries of sim space.
     if ( mPackGrid != 0x0 ) free ( mPackGrid );
     mPackGrid = (int*) malloc ( sizeof(int) * m_GridTotal );
+
+    std::stringstream ss;
+    ss<<"\n\nFluidSystem::SetupGrid()"
+    << "\n m_GridMin : ("   << m_GridMin.x      << "," << m_GridMin.y       << "," << m_GridMin.z   << ")"
+    << "\n m_GridMax : ("   << m_GridMax.x      << "," << m_GridMax.y       << "," << m_GridMax.z   << ")"
+    << "\n m_GridSize : ("  << m_GridSize.x     << "," << m_GridSize.y      << "," << m_GridSize.z  << ")"
+    << "\n m_GridRes : ("   << m_GridRes.x      << "," << m_GridRes.y       << "," << m_GridRes.z   << ")"
+    << "\n m_GridDelta : (" << m_GridDelta.x    << "," << m_GridDelta.y     << "," << m_GridDelta.y << ")"
+    << "\n m_GridTotal : "  << m_GridTotal
+    << "\n m_GridSrch : "   << m_GridSrch
+    << "\n m_GridAdjCnt : " << m_GridAdjCnt
+    << "\n world_cellsize : " << world_cellsize
+    << "\n cell_size : "    << cell_size
+    << "\n sim_scale : "    << sim_scale
+    << std::flush;
+    std::cout<<ss.str()<<std::flush;
 }
 
 ///////////////////////////////////////////////////////////////
@@ -1502,6 +1519,22 @@ void FluidSystem::SetupSpacing (){
     m_Vec[PBOUNDMIN] += 2.0*(m_Param[PGRIDSIZE] / m_Param[PSIMSCALE]);
     m_Vec[PBOUNDMAX] = m_Vec[PVOLMAX];
     m_Vec[PBOUNDMAX] -= 2.0*(m_Param[PGRIDSIZE] / m_Param[PSIMSCALE]);
+
+    std::stringstream ss;
+    ss << "\n\nFluidSystem::SetupSpacing ()"
+    <<"\n m_Param [ PSIMSIZE ]  : "     <<   m_Param [ PSIMSIZE ]
+    <<"\n m_Param [ PSIMSCALE ]  : "    <<   m_Param [ PSIMSCALE ]
+    <<"\n m_Vec[PVOLMAX].z  : "         <<   m_Vec[PVOLMAX].z
+    <<"\n m_Vec[PVOLMIN].z  : "         <<   m_Vec[PVOLMIN].z
+    <<"\n m_Param[PSPACING]  : "        <<   m_Param[PSPACING]
+    <<"\n m_Param [PDIST]  : "          <<   m_Param [PDIST]
+    <<"\n m_Param[PMASS]  : "           <<   m_Param[PMASS]
+    <<"\n m_Param[PRESTDENSITY]  : "    <<   m_Param[PRESTDENSITY]
+    <<"\n m_Param [PSPACING]  : "       <<   m_Param [PSPACING]
+    <<"\n m_Vec[PBOUNDMIN]  : "         <<   m_Vec[PBOUNDMIN].x   <<","<<  m_Vec[PBOUNDMIN].y  <<","<<  m_Vec[PBOUNDMIN].z   <<")"
+    <<"\n m_Vec[PBOUNDMAX]  : "         <<   m_Vec[PBOUNDMAX].x   <<","<<  m_Vec[PBOUNDMAX].y  <<","<<  m_Vec[PBOUNDMAX].z   <<")"
+    << std::flush;
+    cout << ss.str() <<std::flush;
 }
 
 void FluidSystem::SetupSimulation(int gpu_mode, int cpu_mode){ // const char * relativePath, int gpu_mode, int cpu_mode
@@ -1511,25 +1544,25 @@ void FluidSystem::SetupSimulation(int gpu_mode, int cpu_mode){ // const char * r
     mMaxPoints = m_Param [PNUM];
     m_Param [PGRIDSIZE] = 2*m_Param[PSMOOTHRADIUS] / m_Param[PGRID_DENSITY];
     //std::cout<<"\nSetupSimulation chk2, m_FParams.debug="<<m_FParams.debug<<std::flush;
-    
+
     SetupSPH_Kernels ();
     SetupSpacing ();
     SetupGrid ( m_Vec[PVOLMIN]/*bottom corner*/, m_Vec[PVOLMAX]/*top corner*/, m_Param[PSIMSCALE], m_Param[PGRIDSIZE]);
     //std::cout<<"\nSetupSimulation chk3, m_FParams.debug="<<m_FParams.debug<<std::flush;
-    
-    if (gpu_mode != GPU_OFF) {     // create CUDA instance etc.. 
+
+    if (gpu_mode != GPU_OFF) {     // create CUDA instance etc..
         FluidSetupCUDA ( mMaxPoints, m_GridSrch, *(int3*)& m_GridRes, *(float3*)& m_GridSize, *(float3*)& m_GridDelta, *(float3*)& m_GridMin, *(float3*)& m_GridMax, m_GridTotal, 0 );
         UpdateParams();            //  sends simulation params to device.
         UpdateGenome();            //  sends genome to device.              // NB need to initialize genome from file, or something.
     }
     if (m_FParams.debug>1)std::cout<<"\nSetupSimulation chk4, mMaxPoints="<<mMaxPoints<<", gpu_mode="<<gpu_mode<<", cpu_mode="<<cpu_mode<<", m_FParams.debug="<<m_FParams.debug<<std::flush;
-    
+
     AllocateParticles ( mMaxPoints, gpu_mode, cpu_mode );  // allocates only cpu buffer for particles
     if (m_FParams.debug>1)std::cout<<"\nSetupSimulation chk5 "<<std::flush;
-    
+
     AllocateGrid(gpu_mode, cpu_mode);
     if (m_FParams.debug>1)std::cout<<"\nSetupSimulation chk6 "<<std::flush;
-    
+
 }
 
 void FluidSystem::RunSimulation (){

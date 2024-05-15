@@ -1004,6 +1004,25 @@ void FluidSystem::WriteSimParams ( const char * relativePath ){
                            m_Param [ PGROUND_SLOPE ]
                           );
     
+
+    ret = std::fprintf(SimParams_file, "\n\nm_FParams\ndebug : %u", m_FParams.debug ); if (ret!=0) cout << "\nError writing SimParams_file :   debug"<<std::flush;
+    ret = std::fprintf(SimParams_file, "\nnumThreads : %u", m_FParams.numThreads ); if (ret!=0) cout << "\nError writing SimParams_file :   numThreads"<<std::flush;
+    ret = std::fprintf(SimParams_file, "\nnumBlocks : %u", m_FParams.numBlocks ); if (ret!=0) cout << "\nError writing SimParams_file :   numBlocks"<<std::flush;
+    ret = std::fprintf(SimParams_file, "\nthreadsPerBlock : %u", m_FParams.threadsPerBlock ); if (ret!=0) cout << "\nError writing SimParams_file :   threadsPerBlock"<<std::flush;
+    ret = std::fprintf(SimParams_file, "\ndebug : %u", m_FParams.debug ); if (ret!=0) cout << "\nError writing SimParams_file :   "<<std::flush;
+    ret = std::fprintf(SimParams_file, "\ndebug : %u", m_FParams.debug ); if (ret!=0) cout << "\nError writing SimParams_file :   "<<std::flush;
+    ret = std::fprintf(SimParams_file, "\ndebug : %u", m_FParams.debug ); if (ret!=0) cout << "\nError writing SimParams_file :   "<<std::flush;
+    ret = std::fprintf(SimParams_file, "\ndebug : %u", m_FParams.debug ); if (ret!=0) cout << "\nError writing SimParams_file :   "<<std::flush;
+    ret = std::fprintf(SimParams_file, "\ndebug : %u", m_FParams.debug ); if (ret!=0) cout << "\nError writing SimParams_file :   "<<std::flush;
+    ret = std::fprintf(SimParams_file, "\ndebug : %u", m_FParams.debug ); if (ret!=0) cout << "\nError writing SimParams_file :   "<<std::flush;
+    ret = std::fprintf(SimParams_file, "\ndebug : %u", m_FParams.debug ); if (ret!=0) cout << "\nError writing SimParams_file :   "<<std::flush;
+    ret = std::fprintf(SimParams_file, "\ndebug : %u", m_FParams.debug ); if (ret!=0) cout << "\nError writing SimParams_file :   "<<std::flush;
+    ret = std::fprintf(SimParams_file, "\ndebug : %u", m_FParams.debug ); if (ret!=0) cout << "\nError writing SimParams_file :   "<<std::flush;
+
+
+    //  write macros for each data type.
+
+
     if (m_FParams.debug>1) std::cout << "\nvoid FluidSystem::WriteSimParams (const char * relativePath ) wrote file "<< SimParams_file_path <<"\t"<<
               "ret = " << ret << "\n" << std::flush;
     fclose(SimParams_file);

@@ -30,6 +30,7 @@
     #include "masks.h"
 //#include <../cuda-11.2/targets/x86_64-linux/include/curand_kernel.h>
     #include <curand_kernel.h>
+    #include <jsoncpp/json/json.h>
 
 	typedef	unsigned int		uint;	
 	typedef	unsigned short int	ushort;	
@@ -292,22 +293,20 @@
 		int				stride, pnum, pnumActive, maxPoints;
         bool            freeze;
         uint            frame;
-		int				chk;
-		float			pdist, pmass, prest_dens;
+		float			pmass, prest_dens;                                            // pdist,
 		float			pextstiff, pintstiff;
-		float			pradius, psmoothradius, r2, psimscale, pvisc, psurface_t;
-		float			pforce_min, pforce_max, pforce_freq, pground_slope;
-		float			pvel_limit, paccel_limit, pdamp;
+		float			pradius, psmoothradius, r2, psimscale, pvisc, psurface_t;     //
+		float			pforce_min, pforce_max, pforce_freq, pground_slope;           // forces at boundaries and wave machine.
+		float			pdamp;                                                        // damping of particles at sim boundaries. // pvel_limit, paccel_limit,
 		float3			pboundmin, pboundmax, pgravity;
-		float			AL, AL2, VL, VL2;
-		float			H, d2, rd2, vterm;		// used in force calculation
+		float			AL, AL2, VL, VL2;                                             // vel and accel limits used in kernel advanceParticles(..)
+		float			d2, rd2;		                                              // used in force calculation // H, vterm
 		float			poly6kern, spikykern, lapkern, gausskern, wendlandC2kern;
 		float3			gridSize, gridDelta, gridMin, gridMax;
 		int3			gridRes, gridScanMax;
 		int				gridSrch, gridTotal, gridAdjCnt, gridActive;
 		int				gridAdj[64];
-        float           actuation_factor;
-        float           actuation_period;
+        float           actuation_factor, actuation_period;                           // actuated particles for tendon demo.
 	};
     
     //////////////////////

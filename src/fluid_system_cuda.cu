@@ -590,7 +590,7 @@ extern "C" __device__ float contributePressure ( int i, float3 p, int cell, floa
 	float dsq, r, q, b, c, sum = 0.0;//, sum_p6k = 0.0;
 	///*register*/ float d2 = fparam.psimscale * fparam.psimscale;                // max length in simulation space
 	/*register*/ float r2 = fparam.r2; // / d2;                                     // = m_FParams.psmoothradius^2 / m_FParams.psimscale^2
-    /*register*/ float H  = fparam.H;                                           // = m_FParams.psmoothradius / m_FParams.psimscale;
+    /*register*/ //float H  = fparam.H;                                           // = m_FParams.psmoothradius / m_FParams.psimscale;
     /*register*/ float sr = fparam.psmoothradius;
 	
 	int clast = fbuf.bufI(FGRIDOFF)[cell] + fbuf.bufI(FGRIDCNT)[cell];      // off set of this cell in the list of particles,  PLUS  the count of particles in this cell.

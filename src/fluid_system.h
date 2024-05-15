@@ -357,12 +357,12 @@
 		CUmodule					m_Module;
 		CUfunction					m_Func[ FUNC_MAX ];
         
-		// Simulation Parameters                                //  NB MAX_PARAM = 50 
+		// Simulation Parameters                                // NB MAX_PARAM = 50
 		float						m_Param [ MAX_PARAM ];	    // 0-47 used.  see defines above. NB m_Param[1] = maximum number of points.
 		Vector3DF					m_Vec   [ MAX_PARAM ];      // 0-12 used 
 
 		// SPH Kernel functions
-		float						m_R2, m_Poly6Kern, m_LapKern, m_SpikyKern;		
+		float						m_R2, m_Poly6Kern, m_LapKern, m_SpikyKern;
 
 		// Particle Buffers
 		int						mNumPoints;
