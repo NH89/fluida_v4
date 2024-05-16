@@ -39,10 +39,15 @@ void FluidSystem::FluidSetupCUDA ( int num, int gsrch, int3 res, float3 size, fl
 
     // Build Adjacency Lookup
     int cell = 0;
-    for (int y=0; y < gsrch; y++ )
-        for (int z=0; z < gsrch; z++ )
-            for (int x=0; x < gsrch; x++ )
-                m_FParams.gridAdj [ cell++]  = ( y * m_FParams.gridRes.z+ z )*m_FParams.gridRes.x +  x ;
+    for (int y=0; y < gsrch; y++ ){
+        for (int z=0; z < gsrch; z++ ){
+            for (int x=0; x < gsrch; x++ ){
+                m_FParams.gridAdj [ cell]  = ( y * m_FParams.gridRes.z+ z )*m_FParams.gridRes.x +  x ;
+                cout << "\nm_FParams.gridAdj ["<< cell<<"]  " << m_FParams.gridAdj[ cell] ;
+                cell++;
+            }
+        }
+    }
 
     // Compute number of blocks and threads
     m_FParams.threadsPerBlock = 512;                    //TODO probe hardware to set m_FParams.threadsPerBlock
@@ -173,6 +178,10 @@ void FluidSystem::TransferFromCUDA (){
     cuCheck( cuMemcpyDtoH ( m_Fluid.bufI(FNERVEIDX),	m_Fluid.gpu(FNERVEIDX),	    mMaxPoints *sizeof(uint) ),                            "TransferFromCUDA", "cuMemcpyDtoH", "FNERVEIDX",    mbDebug);
     cuCheck( cuMemcpyDtoH ( m_Fluid.bufF(FCONC),	    m_Fluid.gpu(FCONC),	        mMaxPoints *sizeof(float[NUM_TF]) ),                   "TransferFromCUDA", "cuMemcpyDtoH", "FCONC",        mbDebug);
     cuCheck( cuMemcpyDtoH ( m_Fluid.bufI(FEPIGEN),	    m_Fluid.gpu(FEPIGEN),	    mMaxPoints *sizeof(uint[NUM_GENES]) ),                 "TransferFromCUDA", "cuMemcpyDtoH", "FEPIGEN",      mbDebug);
+
+    //cuCheck ( cuMemcpyHtoD ( cuFParams,	&m_FParams,		sizeof(FParams) ), "FluidParamCUDA", "cuMemcpyHtoD", "cuFParams", mbDebug);
+    cuCheck( cuMemcpyDtoH ( &m_FParams,	    cuFParams,	    sizeof(FParams) ), "TransferFromCUDA", "cuMemcpyDtoH", "cuFParams",      mbDebug);
+
 }   // NB found FEPIGEN needed bufI and mMaxPoints, otherwise produced garbled files.
 
 void FluidSystem::Init_FCURAND_STATE_CUDA (){ // designed to use to bootstrap itself. Set j=0 from host, call kernel repeatedly for 256^n threads, n=0-> to pnum threads.

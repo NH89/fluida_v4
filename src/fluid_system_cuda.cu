@@ -652,7 +652,7 @@ extern "C" __global__ void computePressure ( int pnum )
 	float sum = 0.0, sum_p6k = 0.0;
 	for (int c=0; c < fparam.gridAdjCnt; c++) {                                    
 		sum += contributePressure ( i, pos, gc + fparam.gridAdj[c], sum_p6k );    // NB will wrap at boundaries of sim space.
-        //printf("\nkernel computePressure: i = %u ,  fparam.gridAdjCnt = %u ,  fparam.gridAdj[c] = %u", i, fparam.gridAdjCnt, fparam.gridAdj[c]  );
+        //if (i==1) printf("\nkernel computePressure: i = %u ,  fparam.gridAdjCnt = %u ,  fparam.gridAdj[%u] = %u", i, fparam.gridAdjCnt, c, fparam.gridAdj[c]  );
 	}
 	__syncthreads();
     

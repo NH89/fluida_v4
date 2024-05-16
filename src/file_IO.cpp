@@ -1005,23 +1005,71 @@ void FluidSystem::WriteSimParams ( const char * relativePath ){
                           );
     
 
-    ret = std::fprintf(SimParams_file, "\n\nm_FParams\ndebug : %u", m_FParams.debug ); if (ret!=0) cout << "\nError writing SimParams_file :   debug"<<std::flush;
-    ret = std::fprintf(SimParams_file, "\nnumThreads : %u", m_FParams.numThreads ); if (ret!=0) cout << "\nError writing SimParams_file :   numThreads"<<std::flush;
-    ret = std::fprintf(SimParams_file, "\nnumBlocks : %u", m_FParams.numBlocks ); if (ret!=0) cout << "\nError writing SimParams_file :   numBlocks"<<std::flush;
-    ret = std::fprintf(SimParams_file, "\nthreadsPerBlock : %u", m_FParams.threadsPerBlock ); if (ret!=0) cout << "\nError writing SimParams_file :   threadsPerBlock"<<std::flush;
-    ret = std::fprintf(SimParams_file, "\ndebug : %u", m_FParams.debug ); if (ret!=0) cout << "\nError writing SimParams_file :   "<<std::flush;
-    ret = std::fprintf(SimParams_file, "\ndebug : %u", m_FParams.debug ); if (ret!=0) cout << "\nError writing SimParams_file :   "<<std::flush;
-    ret = std::fprintf(SimParams_file, "\ndebug : %u", m_FParams.debug ); if (ret!=0) cout << "\nError writing SimParams_file :   "<<std::flush;
-    ret = std::fprintf(SimParams_file, "\ndebug : %u", m_FParams.debug ); if (ret!=0) cout << "\nError writing SimParams_file :   "<<std::flush;
-    ret = std::fprintf(SimParams_file, "\ndebug : %u", m_FParams.debug ); if (ret!=0) cout << "\nError writing SimParams_file :   "<<std::flush;
-    ret = std::fprintf(SimParams_file, "\ndebug : %u", m_FParams.debug ); if (ret!=0) cout << "\nError writing SimParams_file :   "<<std::flush;
-    ret = std::fprintf(SimParams_file, "\ndebug : %u", m_FParams.debug ); if (ret!=0) cout << "\nError writing SimParams_file :   "<<std::flush;
-    ret = std::fprintf(SimParams_file, "\ndebug : %u", m_FParams.debug ); if (ret!=0) cout << "\nError writing SimParams_file :   "<<std::flush;
-    ret = std::fprintf(SimParams_file, "\ndebug : %u", m_FParams.debug ); if (ret!=0) cout << "\nError writing SimParams_file :   "<<std::flush;
+    ret = std::fprintf(SimParams_file, "\n\nm_FParams" );
+    std::stringstream ss;
+    ss<<"\n  m_FParams.debug                : "<<  m_FParams.debug ;
+    ss<<"\n  m_FParams.numThreads           : "<<  m_FParams.numThreads  ;
+    ss<<"\n  m_FParams.numBlocks            : "<<  m_FParams.numBlocks  ;
+    ss<<"\n  m_FParams.threadsPerBlock      : "<<  m_FParams.threadsPerBlock  ;
+    ss<<"\n  m_FParams.gridThreads          : "<<  m_FParams.gridThreads  ;
+    ss<<"\n  m_FParams.gridBlocks           : "<<  m_FParams.gridBlocks  ;
+    ss<<"\n  m_FParams.szPnts               : "<<  m_FParams.szPnts  ;
+    ss<<"\n  m_FParams.szGrid               : "<<  m_FParams.szGrid  ;
+    ss<<"\n  m_FParams.stride               : "<<  m_FParams.stride  ;
+    ss<<"\n  m_FParams.pnum                 : "<<  m_FParams.pnum  ;
+    ss<<"\n  m_FParams.pnumActive           : "<<  m_FParams.pnumActive  ;
+    ss<<"\n  m_FParams.maxPoints            : "<<  m_FParams.maxPoints  ;
+    ss<<"\n  m_FParams.freeze               : "<<  m_FParams.freeze  ;
+    ss<<"\n  m_FParams.frame                : "<<  m_FParams.frame  ;
+    ss<<"\n  m_FParams.pmass                : "<<  m_FParams.pmass  ;
+    ss<<"\n  m_FParams.prest_dens           : "<<  m_FParams.prest_dens  ;
+    ss<<"\n  m_FParams.pextstiff            : "<<  m_FParams.pextstiff  ;
+    ss<<"\n  m_FParams.pintstiff            : "<<  m_FParams.pintstiff  ;
+    ss<<"\n  m_FParams.pradius              : "<<  m_FParams.pradius  ;
+    ss<<"\n  m_FParams.psmoothradius        : "<<  m_FParams.psmoothradius  ;
+    ss<<"\n  m_FParams.r2                   : "<<  m_FParams.r2  ;
+    ss<<"\n  m_FParams.psimscale            : "<<  m_FParams.psimscale  ;
+    ss<<"\n  m_FParams.pvisc                : "<<  m_FParams.pvisc  ;
+    ss<<"\n  m_FParams.psurface_t           : "<<  m_FParams.psurface_t  ;
+    ss<<"\n  m_FParams.pforce_min           : "<<  m_FParams.pforce_min  ;
+    ss<<"\n  m_FParams.pforce_max           : "<<  m_FParams.pforce_max  ;
+    ss<<"\n  m_FParams.pforce_freq          : "<<  m_FParams.pforce_freq  ;
+    ss<<"\n  m_FParams.pground_slope        : "<<  m_FParams.pground_slope  ;
+    ss<<"\n  m_FParams.pdamp                : "<<  m_FParams.pdamp  ;
+    ss<<"\n  m_FParams.pboundmin            : ("<<  m_FParams.pboundmin.x <<", "     <<  m_FParams.pboundmin.y <<", "    <<  m_FParams.pboundmin.z <<", "<< ")";
+    ss<<"\n  m_FParams.pboundmax            : ("<<  m_FParams.pboundmax.x <<", "     <<  m_FParams.pboundmax.y <<", "    <<  m_FParams.pboundmax.z <<", "<< ")";
+    ss<<"\n  m_FParams.pgravity             : ("<<  m_FParams.pgravity.x <<", "      <<  m_FParams.pgravity.y <<", "     <<  m_FParams.pgravity.z <<", "<< ")";
+    ss<<"\n  m_FParams.AL                   : "<<  m_FParams.AL  ;
+    ss<<"\n  m_FParams.AL2                  : "<<  m_FParams.AL2  ;
+    ss<<"\n  m_FParams.VL                   : "<<  m_FParams.VL  ;
+    ss<<"\n  m_FParams.VL2                  : "<<  m_FParams.VL2  ;
+    ss<<"\n  m_FParams.d2                   : "<<  m_FParams.d2  ;
+    ss<<"\n  m_FParams.rd2                  : "<<  m_FParams.rd2  ;
+    ss<<"\n  m_FParams.poly6kern            : "<<  m_FParams.poly6kern  ;
+    ss<<"\n  m_FParams.spikykern            : "<<  m_FParams.spikykern  ;
+    ss<<"\n  m_FParams.lapkern              : "<<  m_FParams.lapkern  ;
+    ss<<"\n  m_FParams.gausskern            : "<<  m_FParams.gausskern  ;
+    ss<<"\n  m_FParams.wendlandC2kern       : "<<  m_FParams.wendlandC2kern  ;
+    ss<<"\n  m_FParams.gridSize             : ("<<  m_FParams.gridSize.x <<", "      <<  m_FParams.gridSize.y <<", "     <<  m_FParams.gridSize.z <<", "<< ")";
+    ss<<"\n  m_FParams.gridDelta            : ("<<  m_FParams.gridDelta.x <<", "     <<  m_FParams.gridDelta.y <<", "    <<  m_FParams.gridDelta.z <<", "<< ")";
+    ss<<"\n  m_FParams.gridMin              : ("<<  m_FParams.gridMin.x <<", "       <<  m_FParams.gridMin.y <<", "      <<  m_FParams.gridMin.z <<", "<< ")";
+    ss<<"\n  m_FParams.gridMax              : ("<<  m_FParams.gridMax.x <<", "       <<  m_FParams.gridMax.y <<", "      <<  m_FParams.gridMax.z <<", "<< ")";
+    ss<<"\n  m_FParams.gridRes              : ("<<  m_FParams.gridRes.x <<", "       <<  m_FParams.gridRes.y <<", "      <<  m_FParams.gridRes.z <<", "<< ")";
+    ss<<"\n  m_FParams.gridScanMax          : ("<<  m_FParams.gridScanMax.x <<", "   <<  m_FParams.gridScanMax.y <<", "  <<  m_FParams.gridScanMax.z <<", "<< ")";
+    ss<<"\n  m_FParams.gridSrch             : "<<  m_FParams.gridSrch  ;
+    ss<<"\n  m_FParams.gridTotal            : "<<  m_FParams.gridTotal  ;
+    ss<<"\n  m_FParams.gridAdjCnt           : "<<  m_FParams.gridAdjCnt  ;
+    ss<<"\n  m_FParams.gridActive           : "<<  m_FParams.gridActive  ;
+    ss<<"\n  m_FParams.gridAdj[64]          : ";
+    for (int i=0; i<m_FParams.gridAdjCnt; i++) {
+        if (i%3==0) ss <<"\t";
+        if (i%9==0) ss <<"\n";
+        ss << "(" << i << "," << m_FParams.gridAdj[i] <<"), " ;
+    }
+    ss<<"\n  m_FParams.actuation_factor     : "<<  m_FParams.actuation_factor  ;
+    ss<<"\n  m_FParams.actuation_period     : "<<  m_FParams.actuation_period  ;
 
-
-    //  write macros for each data type.
-
+    ret = std::fprintf(SimParams_file, "%s",ss.str().c_str() );
 
     if (m_FParams.debug>1) std::cout << "\nvoid FluidSystem::WriteSimParams (const char * relativePath ) wrote file "<< SimParams_file_path <<"\t"<<
               "ret = " << ret << "\n" << std::flush;

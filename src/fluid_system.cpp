@@ -1720,13 +1720,18 @@ void FluidSystem::Run2Simulation(){
     }
     //launchParams.file_num++;
     
-    TransferFromCUDA ();
+    TransferFromCUDA (); // includes cuFParams
     SavePointsCSV2 ( launchParams.outPath, launchParams.file_num+99);   // save "end condition", even if not saving the series.
     SavePointsVTP2 ( launchParams.outPath, launchParams.file_num+99);
     
-    WriteSimParams ( launchParams.outPath ); 
-    WriteGenome( launchParams.outPath );
-    WriteSpecificationFile_fromLaunchParams( launchParams.outPath );
+    std::stringstream ss;
+    ss << launchParams.outPath << "/device_final/";
+    std::string final_outPath = ss.str();
+    if(mkdir(final_outPath.c_str(), 0755) == -1) cerr << "\nError :  failed to create final_outPath_folder.\n" << strerror(errno) << endl;
+
+    WriteSimParams ( final_outPath.c_str() );
+    WriteGenome( final_outPath.c_str() );
+    WriteSpecificationFile_fromLaunchParams( final_outPath.c_str() );
 }
 
 
