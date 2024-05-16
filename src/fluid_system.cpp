@@ -1540,8 +1540,8 @@ void FluidSystem::SetupSpacing (){
 void FluidSystem::SetupSimulation(int gpu_mode, int cpu_mode){ // const char * relativePath, int gpu_mode, int cpu_mode
      // Allocate buffers for points
     //std::cout<<"\nSetupSimulation chk1, m_FParams.debug="<<m_FParams.debug<<std::flush;
-    m_Param [PNUM] = launchParams.num_particles;                             // NB there is a line of text above the particles, hence -1.
-    mMaxPoints = m_Param [PNUM];
+    m_Param [PNUM]      = launchParams.num_particles;                             // NB there is a line of text above the particles, hence -1.
+    mMaxPoints          = m_Param [PNUM];
     m_Param [PGRIDSIZE] = 2*m_Param[PSMOOTHRADIUS] / m_Param[PGRID_DENSITY];
     //std::cout<<"\nSetupSimulation chk2, m_FParams.debug="<<m_FParams.debug<<std::flush;
 

@@ -125,14 +125,28 @@ usage:
     
 "demoType" sets individual particle properties in "demo/particles_pos_vel_color100001.csv", especially epigenetic states, from 3D positions.
 
-(0:free falling, 1:remodelling & actuation, 2:diffusion & epigenetics.)
+* 0 free falling
+* 1 remodelling & actuation
+* 2 diffusion & epigenetics
     
 "simSpace" sets parameters in "SimParams." , especially gravity, and wavepool actuation.
 
-{0:regression test, 1:Tower(256,128,256), 2:Wave pool(400,200,400), 3:Small dam break(80,60,80), 4:Dual-Wave pool(200,100,30), 5: Microgravity(160,100.160), 6: Morphogenesis small demo(80,50,80) } 
-{7: used by make_demo_2 to take params from SpecificationFile.txt}
+* 0 regression test
+* 1 Tower(256,128,256)
+* 2 Wave pool(400,200,400)
+* 3 Small dam break(80,60,80)
+* 4 Dual-Wave pool(200,100,30)
+* 5 Microgravity(160,100.160)
+* 6 Morphogenesis small demo(80,50,80)
+* 7 used by make_demo_2 to take params from SpecificationFile.txt
+* 8 Param sweep - uses radius = 1 etc. 
     
 e.g.
+
+* make_demo 125 1  6 6 6  0 8       // viscous fluid with high surface tension
+
+
+####Old demos, _might_ not work due to change from SI units to radius = 1.
 
     make_demo 125 1  6 6 6  0 5       // free falling
     
@@ -142,7 +156,6 @@ e.g.
     make_demo 2000 1  6 6 30  1 5     //  "" , with reserve particles for growth.
     
     make_demo 400 1  10 10 3  1 5     // diffusion & epigenetics, with reserve particles for growth.
-    
     
     make_demo 10000 1  100 10 10  1 1
     make_demo 100000 1  100 10 100  1 1
