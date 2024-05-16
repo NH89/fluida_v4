@@ -1011,7 +1011,8 @@ void FluidSystem::Run2GeneAction(){//NB gene sorting occurs within Run2PhysicalS
 }
 
 void FluidSystem::Run2Remodelling(uint steps_per_InnerPhysicalLoop){
-    if(m_FParams.debug>1){std::cout<<"\n####\nRun2Remodelling()start";}
+    //if(m_FParams.debug>-1){
+        std::cout<<"\n####\nRun2Remodelling()start"<<std::flush;//}
     AssembleFibresCUDA ();
     cuCheck(cuCtxSynchronize(), "Run", "cuCtxSynchronize", "After AssembleFibresCUDA", mbDebug); 
     
@@ -1043,7 +1044,7 @@ void FluidSystem::Run2Remodelling(uint steps_per_InnerPhysicalLoop){
         //TransferFromTempCUDA(int buf_id, int sz );
     }
     
-    if(m_FParams.debug>1)std::cout<<"\n####\nRun2Remodelling()end";
+    if(m_FParams.debug>-1)std::cout<<"\n####\nRun2Remodelling()end";
 }
 
 
@@ -1226,10 +1227,10 @@ void FluidSystem::SetupExampleParams (uint spacing){
         m_Vec [ PPLANE_GRAV_DIR ].Set ( 0.0, 0.0, 0.0 );
         //m_Param [ PSPACING ] = spacing;//0.5;				// Fixed spacing		Dx = x-axis density
         m_Param [ PSMOOTHRADIUS ] =	m_Param [PSPACING];		// Search radius
-        //m_Toggle [ PRUN ] = false;				// Do NOT run sim. Neighbors only.
-        //m_Param [PDRAWMODE] = 1;				// Point drawing
-        //m_Param [PDRAWGRID] = 1;				// Grid drawing
-        //m_Param [PDRAWTEXT] = 1;				// Text drawing
+        //m_Toggle [ PRUN ] = false;				        // Do NOT run sim. Neighbors only.
+        //m_Param [PDRAWMODE] = 1;			                // Point drawing
+        //m_Param [PDRAWGRID] = 1;		                    // Grid drawing
+        //m_Param [PDRAWTEXT] = 1;		                    // Text drawing
         m_Param [PSIMSCALE ] = 1.0f;
         launchParams.read_genome = 'y'; 
     }
@@ -1696,7 +1697,9 @@ void FluidSystem::Run2Simulation(){
                 Run2InnerPhysicalLoop();                                                                    // Run2InnerPhysicalLoop();
             }
             if(launchParams.gene_activity=='y') Run2GeneAction();                                           // Run2GeneAction();
-            if(launchParams.remodelling=='y') Run2Remodelling(launchParams.steps_per_InnerPhysicalLoop);                                          // Run2Remodelling();
+            //if(launchParams.remodelling=='y')
+                cout << "\n(launchParams.remodelling=='y')="<<(launchParams.remodelling=='y')<< ",   launchParams.remodelling="<<launchParams.remodelling<<endl<<std::flush;
+                Run2Remodelling(launchParams.steps_per_InnerPhysicalLoop);                                          // Run2Remodelling();
             Run2PhysicalSort();                                                                             // Run2PhysicalSort();                // sort required for SavePointsVTP2 
         }
         auto begin = std::chrono::steady_clock::now();

@@ -714,7 +714,8 @@ void FluidSystem::AssembleFibresCUDA (){  //kernel: void assembleMuscleFibres ( 
 }
 
 void FluidSystem::ComputeBondChangesCUDA (uint steps_per_InnerPhysicalLoop){// Given the action of the genes, compute the changes to particle properties & splitting/combining  NB also "inserts changes" 
-//  if (m_FParams.debug>1)printf("\n m_Fluid.gpu(FGRIDOFF_CHANGES)=%llu   ,\t m_Fluid.gpu(FGRIDCNT_CHANGES)=%llu   \n",m_Fluid.gpu(FGRIDOFF_CHANGES) , m_Fluid.gpu(FGRIDCNT_CHANGES)   );
+  //if (m_FParams.debug>-1)
+      printf("\n FluidSystem::ComputeBondChangesCUDA() : m_Fluid.gpu(FGRIDOFF_CHANGES)=%llu   ,\t m_Fluid.gpu(FGRIDCNT_CHANGES)=%llu   \n",m_Fluid.gpu(FGRIDOFF_CHANGES) , m_Fluid.gpu(FGRIDCNT_CHANGES)   );
   
     cuCheck ( cuMemsetD8 ( m_Fluid.gpu(FGRIDOFF_CHANGES), 0,	m_GridTotal *sizeof(uint[NUM_CHANGES]) ), "ComputeBondChangesCUDA", "cuMemsetD8", "FGRIDOFF", mbDebug );
                                             //NB list for all living cells. (non senescent) = FEPIGEN[2]
@@ -725,23 +726,25 @@ void FluidSystem::ComputeBondChangesCUDA (uint steps_per_InnerPhysicalLoop){// G
     int numBlocks, numThreads;
     computeNumBlocks (list_length, m_FParams.threadsPerBlock, numBlocks, numThreads);
     
-    //std::cout<<"\n\nComputeBondChangesCUDA (): m_FParams.debug = "<<m_FParams.debug<<", (m_FParams.debug>1)="<<(m_FParams.debug>1)<<"\n"<<std::flush;
+    std::cout<<"\n\nComputeBondChangesCUDA (): m_FParams.debug = "<<m_FParams.debug<<", (m_FParams.debug>1)="<<(m_FParams.debug>1)<<"\n"<<std::flush;
     
-    if (m_FParams.debug>1) std::cout<<"\n\nComputeBondChangesCUDA (): list_length="<<list_length<<", m_FParams.threadsPerBlock="<<m_FParams.threadsPerBlock<<", numBlocks="<<numBlocks<<",  numThreads="<<numThreads<<". \t\t args={mActivePoints="<<mActivePoints<<", list_length="<<list_length<<"}\n\n"<<std::flush;
+    //if (m_FParams.debug>-1)
+        std::cout<<"\n\nComputeBondChangesCUDA (): list_length="<<list_length<<", m_FParams.threadsPerBlock="<<m_FParams.threadsPerBlock<<", numBlocks="<<numBlocks<<",  numThreads="<<numThreads<<". \t\t args={mActivePoints="<<mActivePoints<<", list_length="<<list_length<<"}\n\n"<<std::flush;
     
     cuCheck ( cuLaunchKernel ( m_Func[FUNC_COMPUTE_BOND_CHANGES],  m_FParams.numBlocks, 1, 1, m_FParams.numThreads, 1, 1, 0, NULL, args, NULL), "computeBondChanges", "cuLaunch", "FUNC_COMPUTE_BOND_CHANGES", mbDebug);
 }
 
 void FluidSystem::ComputeParticleChangesCUDA (){// Call each for dense list to execute particle changes. NB Must run concurrently without interfering => no cuCtxSynchronize()
     uint startNewPoints = mActivePoints + 1;
-    if (m_FParams.debug>2)printf("\n");
+    //if (m_FParams.debug>-1)
+        printf("\nFluidSystem::ComputeParticleChangesCUDA ()");
     for (int change_list = 0; change_list<NUM_CHANGES;change_list++){
     //int change_list = 0; // TODO debug, chk one kernel at a time
         uint list_length = m_Fluid.bufI(FDENSE_LIST_LENGTHS_CHANGES)[change_list];  // num blocks and threads by list length
         //uint list_length = m_Fluid.bufI(FDENSE_BUF_LENGTHS_CHANGES)[change_list]; 
         //if (change_list!=0 && change_list!=1)continue; // only test heal() and lengthenTissue() for now.
         
-        if (m_FParams.debug>2)printf("\n\nComputeParticleChangesCUDA(): startNewPoints=%u, change_list=%u, list_length=%u, mMaxPoints=%u \t", 
+        if (m_FParams.debug>-2)printf("\n\nComputeParticleChangesCUDA(): startNewPoints=%u, change_list=%u, list_length=%u, mMaxPoints=%u \t",
             startNewPoints, change_list, list_length, mMaxPoints); 
     
         if ((change_list >0)&&(startNewPoints + list_length > mMaxPoints)){         // NB heal() does not create new bonds.
@@ -759,7 +762,8 @@ void FluidSystem::ComputeParticleChangesCUDA (){// Call each for dense list to e
         
         computeNumBlocks (list_length, m_FParams.threadsPerBlock, numBlocks, numThreads);
         
-        if (m_FParams.debug>2) std::cout
+        //if (m_FParams.debug>-2)
+            std::cout
             <<"\nComputeParticleChangesCUDA ():"
             <<" frame ="                    <<m_FParams.frame
             <<", mActivePoints="            <<mActivePoints
@@ -775,7 +779,8 @@ void FluidSystem::ComputeParticleChangesCUDA (){// Call each for dense list to e
             <<"\t"<<std::flush;
         
         if( (list_length>0) && (numBlocks>0) && (numThreads>0)){
-            if (m_FParams.debug>0) std::cout
+            //if (m_FParams.debug>-1)
+                std::cout
                 <<"\nComputeParticleChangesCUDA ():"
                 <<"\tCalling m_Func[FUNC_HEAL+"             <<change_list
                 <<"], list_length="                         <<list_length
@@ -805,7 +810,7 @@ void FluidSystem::ComputeParticleChangesCUDA (){// Call each for dense list to e
     8   #define FUNC_WEAKEN_TISSUE              31 //weaken_tissue
          */
     }
-    if (m_FParams.debug>1) std::cout<<"\nFinished ComputeParticleChangesCUDA ()\n"<<std::flush;
+    if (m_FParams.debug>-1) std::cout<<"\nFinished ComputeParticleChangesCUDA ()\n"<<std::flush;
 }
 
 void FluidSystem::CleanBondsCUDA (){

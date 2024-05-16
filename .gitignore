@@ -177,6 +177,7 @@ data/
 data/check/
 data/demo/
 data/test/
+model_archive/
 Debug/
 ./old-*
 *.kdev4
