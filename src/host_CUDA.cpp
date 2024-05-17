@@ -682,7 +682,7 @@ void FluidSystem::ComputeGenesCUDA (){  // for each gene, call a kernel wih the 
 }
 
 void FluidSystem::AssembleFibresCUDA (){  //kernel: void assembleMuscleFibres ( int pnum, uint list, uint list_length )
-    if (m_FParams.debug>1)cout << "\n\nAssembleFibresCUDA ()\n"<<std::flush;
+    if (m_FParams.debug>-1)cout << "\n\nAssembleFibresCUDA ()\n"<<std::flush;
     uint gene = 7; // muscle
     uint list_length = m_Fluid.bufI(FDENSE_LIST_LENGTHS)[gene];
     void* args[3] = { &m_FParams.pnumActive, &gene, &list_length };
@@ -726,10 +726,10 @@ void FluidSystem::ComputeBondChangesCUDA (uint steps_per_InnerPhysicalLoop){// G
     int numBlocks, numThreads;
     computeNumBlocks (list_length, m_FParams.threadsPerBlock, numBlocks, numThreads);
     
-    std::cout<<"\n\nComputeBondChangesCUDA (): m_FParams.debug = "<<m_FParams.debug<<", (m_FParams.debug>1)="<<(m_FParams.debug>1)<<"\n"<<std::flush;
+    std::cout<<"\nComputeBondChangesCUDA (): m_FParams.debug = "<<m_FParams.debug<<", (m_FParams.debug>-1)="<<(m_FParams.debug>1)<<"\n"<<std::flush;
     
     //if (m_FParams.debug>-1)
-        std::cout<<"\n\nComputeBondChangesCUDA (): list_length="<<list_length<<", m_FParams.threadsPerBlock="<<m_FParams.threadsPerBlock<<", numBlocks="<<numBlocks<<",  numThreads="<<numThreads<<". \t\t args={mActivePoints="<<mActivePoints<<", list_length="<<list_length<<"}\n\n"<<std::flush;
+        std::cout<<"\nComputeBondChangesCUDA (): list_length="<<list_length<<", m_FParams.threadsPerBlock="<<m_FParams.threadsPerBlock<<", numBlocks="<<numBlocks<<",  numThreads="<<numThreads<<". \t\t args={mActivePoints="<<mActivePoints<<", list_length="<<list_length<<"}\n\n"<<std::flush;
     
     cuCheck ( cuLaunchKernel ( m_Func[FUNC_COMPUTE_BOND_CHANGES],  m_FParams.numBlocks, 1, 1, m_FParams.numThreads, 1, 1, 0, NULL, args, NULL), "computeBondChanges", "cuLaunch", "FUNC_COMPUTE_BOND_CHANGES", mbDebug);
 }
