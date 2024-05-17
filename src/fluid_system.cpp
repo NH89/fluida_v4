@@ -1001,7 +1001,8 @@ void FluidSystem::Run2InnerPhysicalLoop(){
 }
 
 void FluidSystem::Run2GeneAction(){//NB gene sorting occurs within Run2PhysicalSort()
-    if(m_FParams.debug>1)std::cout<<"\n####\nRun2GeneAction()start";
+    //if(m_FParams.debug>-1)
+        std::cout<<"\n####\nRun2GeneAction()start";
     ComputeDiffusionCUDA();
     cuCheck(cuCtxSynchronize(), "Run", "cuCtxSynchronize", "After ComputeDiffusionCUDA", mbDebug);
     
