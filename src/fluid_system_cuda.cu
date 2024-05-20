@@ -3217,7 +3217,7 @@ extern "C" __global__ void computeForce ( int pnum, bool freeze, uint frame)
 	if ( i >= pnum ) return;
 	uint gc = fbuf.bufI(FGCELL)[ i ];                                               // Get search cell	
 	if ( gc == GRID_UNDEF ) return;                                                 // particle out-of-range
-
+//printf(".");
 	gc -= (1*fparam.gridRes.z + 1)*fparam.gridRes.x + 1;
 	/*register*/ float3 force, eterm, dist;                                             // request to compiler to store in a /*register*/ for speed.
 	force = make_float3(0,0,0);    eterm = make_float3(0,0,0);     dist  = make_float3(0,0,0);
@@ -3231,7 +3231,7 @@ extern "C" __global__ void computeForce ( int pnum, bool freeze, uint frame)
         bond_dsq[a]= fparam.rd2;                                                    // NB if ( dsq < fparam.rd2 && dsq > 0) is the cut off for fluid interaction range
     } 
     uint i_ID = fbuf.bufI(FPARTICLE_ID)[i];
-    //if(fbuf.bufI(FPARTICLE_ID)[i]<10) printf("\ncomputeForce() chk2: ParticleID=%u  ",fbuf.bufI(FPARTICLE_ID)[i] );
+    if(fbuf.bufI(FPARTICLE_ID)[i]%10==0) printf(".");// \nkernel computeForce() chk1: ParticleID=%u  ",fbuf.bufI(FPARTICLE_ID)[i] );
     //__syncthreads();
     
     float3  pvel = {fbuf.bufF3(FVEVAL)[ i ].x,  fbuf.bufF3(FVEVAL)[ i ].y,  fbuf.bufF3(FVEVAL)[ i ].z}; // copy i's FEVAL to thread memory
@@ -3269,19 +3269,19 @@ extern "C" __global__ void computeForce ( int pnum, bool freeze, uint frame)
             
             eterm = ((float)(abs_dist < elastic_limit)) * ( ((dist/abs_dist) * spring_strain * modulus) - damping_coeff*rel_vel) /(fparam.pmass); //Accel due to elastic bond. NB equal masses particles
             //eterm = make_float3(0,0,0);
-            
+
             if(fparam.debug >0  /*&& abs_dist>1.5*/   /* i==uint(pnum/2) */  /*fbuf.bufF(FEPIGEN)[i +  12*fparam.maxPoints]*/) {                      // if "external actuation" particle
                 long_bonds=true;
-                printf("\ncomputeForce() 1: frame=%u, i=,%u, i_ID=%u, j=%u, j_ID=%u, other_particle_ID=%u, \t\t bond=,%u, eterm=(,\t%f,\t%f,\t%f,\t) restlength=%f, modulus=%f , abs_dist=%f , spring_strain=%f , strain_integrator=%f,  damping_coeff*rel_vel.z/fparam.pmass=%f,  ((dist/abs_dist) * spring_strain * modulus) /fparam.pmass=%f ",
-                       frame, i, i_ID,  j, fbuf.bufI(FPARTICLE_ID)[j], other_particle_ID, a, eterm.x,eterm.y,eterm.z,   restlength , modulus , abs_dist , spring_strain , fbuf.bufF(FELASTIDX)[bond + 7],
-                       damping_coeff*rel_vel.z/fparam.pmass,     (((dist.z/abs_dist) * spring_strain * modulus) /fparam.pmass)
-                      );
+//                 printf("\nkernel computeForce()  chk2: frame=%u, i=,%u, i_ID=%u, j=%u, j_ID=%u, other_particle_ID=%u, \t\t bond=,%u, eterm=(,\t%f,\t%f,\t%f,\t) restlength=%f, modulus=%f , abs_dist=%f , spring_strain=%f , strain_integrator=%f,  damping_coeff*rel_vel.z/fparam.pmass=%f,  ((dist/abs_dist) * spring_strain * modulus) /fparam.pmass=%f ",
+//                        frame, i, i_ID,  j, fbuf.bufI(FPARTICLE_ID)[j], other_particle_ID, a, eterm.x,eterm.y,eterm.z,   restlength , modulus , abs_dist , spring_strain , fbuf.bufF(FELASTIDX)[bond + 7],
+//                        damping_coeff*rel_vel.z/fparam.pmass,     (((dist.z/abs_dist) * spring_strain * modulus) /fparam.pmass)
+//                       );
             }
-            
+
             if(eterm.x!=eterm.x||eterm.y!=eterm.y||eterm.z!=eterm.z){               // "isnan()" by IEEE 754 rule, NaN is not equal to NaN
                 if(!hide ){ 
-                printf("\n#### i=,%i, j=,%i, bond=,%i, eterm.x=%f, eterm.y=%f, eterm.z=%f  \t####",i,j,a,  eterm.x,eterm.y,eterm.z);
-                printf("\ncomputeForce() chk3: ParticleID=%u, bond=%u, restlength=%f, modulus=%f , abs_dist=%f , spring_strain=%f , strain_integrator=%f  ",fbuf.bufI(FPARTICLE_ID)[i], a, restlength , modulus , abs_dist , spring_strain , fbuf.bufF(FELASTIDX)[bond + 7]  );
+                printf("\ncomputeForce() chk3 #### i=,%i, j=,%i, bond=,%i, eterm.x=%f, eterm.y=%f, eterm.z=%f  \t####",i,j,a,  eterm.x,eterm.y,eterm.z);
+                printf("\ncomputeForce() chk4: ParticleID=%u, bond=%u, restlength=%f, modulus=%f , abs_dist=%f , spring_strain=%f , strain_integrator=%f  ",fbuf.bufI(FPARTICLE_ID)[i], a, restlength , modulus , abs_dist , spring_strain , fbuf.bufF(FELASTIDX)[bond + 7]  );
                 }
             }else{
                 force -= eterm;                                                     // elastic force towards other particle, if (rest_len -abs_dist) is -ve
@@ -3303,7 +3303,7 @@ extern "C" __global__ void computeForce ( int pnum, bool freeze, uint frame)
         //__syncthreads();    // when is this needed ? ############
     }   
 
-    //if (fparam.debug>2)printf("\nComputeForce chk4: i=%u, bondsToFill=%u,  gc=%u,  fparam.gridTotal=%u", i, bondsToFill, gc, fparam.gridTotal);  // was always zero . why ?
+ //   if (fparam.debug>0)printf("\nComputeForce chk5: i=%u, bondsToFill=%u,  gc=%u,  fparam.gridTotal=%u", i, bondsToFill, gc, fparam.gridTotal);  // was always zero . why ?
     //__syncthreads();
     
     //if(i<10) printf("\n computeForce()1: i=,%u, elastic force=(,%f,%f,%f,) ",i, force.x,force.y,force.z);
