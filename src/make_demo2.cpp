@@ -4,11 +4,14 @@
 #include <string.h>
 #include <chrono>
 #include <filesystem>
+#include <fstream>
 #include <iostream>
+//#include <boost/filesystem.hpp>
 
 #include "fluid_system.h"
 
 typedef	unsigned int		uint;	
+using namespace std;
 
 int main ( int argc, const char** argv ) 
 {
@@ -23,12 +26,20 @@ int main ( int argc, const char** argv )
         auto now = std::chrono::system_clock::now();
         auto in_time_t = std::chrono::system_clock::to_time_t(now);
         std::stringstream datetime;
-        datetime << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d %X");
+        datetime << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d_%X");
         //std::ofstream myFile2("report_" + datetime.str() + ".csv");
         sprintf ( input_folder, "%s", argv[1] );
         sprintf ( output_folder, "%s_%s", argv[2], datetime.str().c_str() );                // Add timestamp to output folder name.
         printf ( "input_folder = %s , output_folder = %s\n", input_folder, output_folder );
     }
+    stringstream outfile;
+    outfile << "./" << output_folder;
+    std::filesystem::create_directory( outfile.str() );
+    outfile <<  "/make_demo2_output.txt";
+    ofstream fileOut( outfile.str().c_str() );                                              // Opening the output file stream and associate it with
+    cout << "\ncout outfile = " << outfile.str().c_str() ;                                  // Redirecting cout to write to "output.txt"
+    cout.rdbuf( fileOut.rdbuf() );
+
 cout << "\nmake_demo2: chk_1 "<<std::flush;
     // Initialize
     cuInit ( 0 );
