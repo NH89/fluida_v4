@@ -32,12 +32,21 @@ int main ( int argc, const char** argv )
         sprintf ( output_folder, "%s_%s", argv[2], datetime.str().c_str() );                // Add timestamp to output folder name.
         printf ( "input_folder = %s , output_folder = %s\n", input_folder, output_folder );
     }
+    cout <<"\n main chk 1"<<flush;
     stringstream outfile;
     outfile << "./" << output_folder;
+
+    cout <<"\n main chk 2"<<flush;
     std::filesystem::create_directory( outfile.str() );
+
+    cout <<"\n main chk 3"<<flush;
     outfile <<  "/make_demo2_output.txt";
+
+    cout << "\ncout outfile = " << outfile.str() ;
     ofstream fileOut( outfile.str().c_str() );                                              // Opening the output file stream and associate it with
-    cout << "\ncout outfile = " << outfile.str().c_str() ;                                  // Redirecting cout to write to "output.txt"
+
+    cout <<"\n main chk 4"<<flush;
+    cout << "\ncout outfile = " << outfile.str() ;                                  // Redirecting cout to write to "output.txt"
     cout.rdbuf( fileOut.rdbuf() );
 
 cout << "\nmake_demo2: chk_1 "<<std::flush;

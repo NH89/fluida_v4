@@ -605,7 +605,7 @@ void FluidSystem::CountingSortChangesCUDA ( ){
                                                                                                                 // Get device pointer to FDENSE_LISTS_CHANGES[change_list].
             cuCheck( cuMemcpyDtoH ( fDenseList2, *_list2pointer,	2*sizeof(uint[densebuff_len[change_list]]) ), "PrefixSumChangesCUDA", "cuMemcpyDtoH", "FGRIDCNT", mbDebug);
             char filename[256];
-            sprintf(filename, "CountingSortChangesCUDA__m_Fluid.bufII(FDENSE_LISTS_CHANGES)[%u].csv", change_list);
+            sprintf(filename, "%s/CountingSortChangesCUDA__m_Fluid.bufII(FDENSE_LISTS_CHANGES)[%u].csv", launchParams.outPath, change_list);
             SaveUintArray_2Columns( fDenseList2, denselist_len[change_list], densebuff_len[change_list], filename );
             ///
             printf("\n\n*_list2pointer=%llu",*_list2pointer);
