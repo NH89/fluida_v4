@@ -1072,7 +1072,7 @@ extern "C" __global__ void computeBondChanges ( int pnum, uint list_length, uint
     float*bond_flt_ptr  = &fbuf.bufF(FELASTIDX)[i*BOND_DATA];                                       //FELASTIDX   [0]current index, [1]elastic limit, [2]restlength, [3]modulus,
                                                                                                                 //[4]damping coeff, [5]particle ID,   [6]bond index, 
                                                                                                                 //[7]stress integrator,  [8]change-type binary indicator
-    if (fparam.debug>0 && i==53 ) {printf("\ncomputeBondChanges_3:i=%u, initial reading bond_flt_ptr[rest_length]=%f ,  \t",
+    if (fparam.debug>0 && i%100==0 ) {printf("\ncomputeBondChanges_3:i=%u, initial reading bond_flt_ptr[rest_length]=%f ,  \t",
                 i, bond_flt_ptr[rest_length]  ); }
                                                                                                                 
     /*register*/ int gridTot = fparam.gridTotal;
@@ -1121,7 +1121,7 @@ extern "C" __global__ void computeBondChanges ( int pnum, uint list_length, uint
     
     //if (fparam.debug>2 && i%1000==0)printf(",%u,",i);
     
-    if (fparam.debug>0 && i==0 ) {printf("\tcomputeBondChanges_4:i=%u,  bond_type=(%u,%u,%u,%u), fgenome.tanh_param[bond_type[bond]][fgenome.s_d]=%f  \t",
+    if (fparam.debug>0 && i%100==0 ) {printf("\ncomputeBondChanges_4:i=%u,  bond_type=(%u,%u,%u,%u), fgenome.tanh_param[bond_type[bond]][fgenome.s_d]=%f  \t",
         i, bond_type[0],bond_type[1],bond_type[2],bond_type[3],   fgenome.tanh_param[bond_type[3]][fgenome.s_d]   ); }
     
     // bond ID for weaken and shorten
@@ -1130,7 +1130,7 @@ extern "C" __global__ void computeBondChanges ( int pnum, uint list_length, uint
     uint shorten = 0;
     
     for (uint bond=0; bond<BONDS_PER_PARTICLE; bond++, bond_uint_ptr+=DATA_PER_BOND, bond_flt_ptr+=DATA_PER_BOND ){
-        if (fparam.debug>0 && i==53 ) {printf("\ncomputeBondChanges_5:i=%u,  bond=%u, 2nd reading bond_flt_ptr[rest_length]=%f ", i, bond, bond_flt_ptr[rest_length] );}
+        if (fparam.debug>0 && i%100==0 ) {printf("\ncomputeBondChanges_5:i=%u,  bond=%u, 2nd reading bond_flt_ptr[rest_length]=%f ", i, bond, bond_flt_ptr[rest_length] );}
 
         if (bond_flt_ptr[rest_length]>0){                                                           // NB (rest_length==0) => bond broken, do not modify.
             float strain_integrator_ = bond_flt_ptr[strain_integrator] / float(steps_per_InnerPhysicalLoop);
@@ -1140,7 +1140,7 @@ extern "C" __global__ void computeBondChanges ( int pnum, uint list_length, uint
             float * param_ptr = fgenome.param[bond_type[bond]];
                                                                             // Read the tanh() shift parameters for the bond
             float L_a =fgenome.tanh_param[bond_type[bond]][fgenome.l_a];    // lengthen/shorten  l_a (y-shift),	 l_b (y-scaling),	 l_c (x-scaling),	 l_d (x-shift), 
-            float L_b =fgenome.tanh_param[bond_type[bond]][fgenome.l_b];
+            float L_b =fgenome.tanh_param[bond_type[bond]][fgenome.l_b];    // NB  fgenome.l_a etc are an enum for [8] in float tanh_param[3][8];
             float L_c =fgenome.tanh_param[bond_type[bond]][fgenome.l_c];
             float L_d =fgenome.tanh_param[bond_type[bond]][fgenome.l_d];
             
@@ -1163,8 +1163,8 @@ extern "C" __global__ void computeBondChanges ( int pnum, uint list_length, uint
             // rest_len = np.append(rest_len, rest_len[i] * rl_mul )
             bond_flt_ptr[rest_length] *= L_a + L_b * tanh( L_c * strain_integrator_ - L_d   );      // NB l_abcd & s_abcd should be defined in genome. 
                                                                                                     // The rules for generating them should be in notes/scripts. 
-            if (/*tissueType==6 &&*/ i%100==0 ) {printf("\ncomputeBondChanges_6:i=%u,  bond=%u, bond_flt_ptr[rest_length]=%f , multiplier=%f, L_a=%f, L_b=%f, L_c=%f, L_d=%f,  strain_integrator_=%f \t",
-                i, bond,    bond_flt_ptr[rest_length],  L_a+L_b*tanh(L_c*strain_integrator_-L_d), L_a, L_b, L_c, L_d, strain_integrator_  ); }
+            if (/*tissueType==6 &&*/ i%100==0 ) {printf("\ncomputeBondChanges_6:i=%u,  bond=%u, bond_type[bond]=%u,  bond_flt_ptr[rest_length]=%f , multiplier=%f, L_a=%f, L_b=%f, L_c=%f, L_d=%f,  strain_integrator_=%f \t",
+                i, bond, bond_type[bond],   bond_flt_ptr[rest_length],  L_a+L_b*tanh(L_c*strain_integrator_-L_d), L_a, L_b, L_c, L_d, strain_integrator_  ); }
                 
                 
             
@@ -3231,7 +3231,7 @@ extern "C" __global__ void computeForce ( int pnum, bool freeze, uint frame)
         bond_dsq[a]= fparam.rd2;                                                    // NB if ( dsq < fparam.rd2 && dsq > 0) is the cut off for fluid interaction range
     } 
     uint i_ID = fbuf.bufI(FPARTICLE_ID)[i];
-    if(fbuf.bufI(FPARTICLE_ID)[i]%10==0) printf(".");// \nkernel computeForce() chk1: ParticleID=%u  ",fbuf.bufI(FPARTICLE_ID)[i] );
+//     if(fbuf.bufI(FPARTICLE_ID)[i]%100==0) printf("\nkernel computeForce() chk1: ParticleID=%u  ",fbuf.bufI(FPARTICLE_ID)[i]);
     //__syncthreads();
     
     float3  pvel = {fbuf.bufF3(FVEVAL)[ i ].x,  fbuf.bufF3(FVEVAL)[ i ].y,  fbuf.bufF3(FVEVAL)[ i ].z}; // copy i's FEVAL to thread memory
@@ -3270,13 +3270,14 @@ extern "C" __global__ void computeForce ( int pnum, bool freeze, uint frame)
             eterm = ((float)(abs_dist < elastic_limit)) * ( ((dist/abs_dist) * spring_strain * modulus) - damping_coeff*rel_vel) /(fparam.pmass); //Accel due to elastic bond. NB equal masses particles
             //eterm = make_float3(0,0,0);
 
-            if(fparam.debug >0  /*&& abs_dist>1.5*/   /* i==uint(pnum/2) */  /*fbuf.bufF(FEPIGEN)[i +  12*fparam.maxPoints]*/) {                      // if "external actuation" particle
-                long_bonds=true;
-//                 printf("\nkernel computeForce()  chk2: frame=%u, i=,%u, i_ID=%u, j=%u, j_ID=%u, other_particle_ID=%u, \t\t bond=,%u, eterm=(,\t%f,\t%f,\t%f,\t) restlength=%f, modulus=%f , abs_dist=%f , spring_strain=%f , strain_integrator=%f,  damping_coeff*rel_vel.z/fparam.pmass=%f,  ((dist/abs_dist) * spring_strain * modulus) /fparam.pmass=%f ",
-//                        frame, i, i_ID,  j, fbuf.bufI(FPARTICLE_ID)[j], other_particle_ID, a, eterm.x,eterm.y,eterm.z,   restlength , modulus , abs_dist , spring_strain , fbuf.bufF(FELASTIDX)[bond + 7],
-//                        damping_coeff*rel_vel.z/fparam.pmass,     (((dist.z/abs_dist) * spring_strain * modulus) /fparam.pmass)
-//                       );
-            }
+//             if(fparam.debug >0  && (fbuf.bufI(FPARTICLE_ID)[i]%100==0) ) {                      // if "external actuation" particle
+//                 /*&& abs_dist>1.5*/   /* i==uint(pnum/2) */  /*fbuf.bufF(FEPIGEN)[i +  12*fparam.maxPoints]*/
+//                 long_bonds=true;
+//                  printf("\nkernel computeForce()  chk2: frame=%u, i=,%u, i_ID=%u, j=%u, j_ID=%u, other_particle_ID=%u, \t\t bond=,%u, eterm=(,\t%f,\t%f,\t%f,\t) restlength=%f, modulus=%f , abs_dist=%f , spring_strain=%f , strain_integrator=%f,  damping_coeff*rel_vel.z/fparam.pmass=%f,  ((dist/abs_dist) * spring_strain * modulus) /fparam.pmass=%f ",
+//                         frame, i, i_ID,  j, fbuf.bufI(FPARTICLE_ID)[j], other_particle_ID, a, eterm.x,eterm.y,eterm.z,   restlength , modulus , abs_dist , spring_strain , fbuf.bufF(FELASTIDX)[bond + strain_integrator],
+//                         damping_coeff*rel_vel.z/fparam.pmass,     (((dist.z/abs_dist) * spring_strain * modulus) /fparam.pmass)
+//                        );
+//             }
 
             if(eterm.x!=eterm.x||eterm.y!=eterm.y||eterm.z!=eterm.z){               // "isnan()" by IEEE 754 rule, NaN is not equal to NaN
                 if(!hide ){ 

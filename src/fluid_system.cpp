@@ -931,6 +931,7 @@ void FluidSystem::Run (const char * relativePath, int frame, bool debug, bool ge
 }// 0:start, 1:InsertParticles, 2:PrefixSumCellsCUDA, 3:CountingSortFull, 4:ComputePressure, 5:ComputeForce, 6:Advance, 7:AdvanceTime
 
 void FluidSystem::Run2PhysicalSort(){
+    std::cerr << "\nRun2PhysicalSort() " << std::flush;
     if(m_FParams.debug>1)std::cout<<"\n####\nRun2PhysicalSort()start";
     InsertParticlesCUDA ( 0x0, 0x0, 0x0 );
     cuCheck(cuCtxSynchronize(), "Run", "cuCtxSynchronize", "After InsertParticlesCUDA", mbDebug);
@@ -958,6 +959,7 @@ void FluidSystem::Run2PhysicalSort(){
 }
 
 void FluidSystem::Run2InnerPhysicalLoop(){
+    std::cerr << "\nRun2InnerPhysicalLoop() " << std::flush;
     if(m_FParams.debug>1)std::cout<<"\n####\nRun2InnerPhysicalLoop()start";
     if(m_FParams.freeze==true){
         InitializeBondsCUDA ();
@@ -1001,6 +1003,7 @@ void FluidSystem::Run2InnerPhysicalLoop(){
 }
 
 void FluidSystem::Run2GeneAction(){//NB gene sorting occurs within Run2PhysicalSort()
+    std::cerr << "\nRun2GeneAction() " << std::flush;
     //if(m_FParams.debug>-1)
         std::cout<<"\n####\nRun2GeneAction()start";
     ComputeDiffusionCUDA();
@@ -1012,6 +1015,7 @@ void FluidSystem::Run2GeneAction(){//NB gene sorting occurs within Run2PhysicalS
 }
 
 void FluidSystem::Run2Remodelling(uint steps_per_InnerPhysicalLoop){
+    std::cerr << "\nRun2Remodelling() " << std::flush;
     //if(m_FParams.debug>-1){
         std::cout<<"\n####\nRun2Remodelling()start"<<std::flush;//}
     AssembleFibresCUDA ();
@@ -1469,35 +1473,35 @@ void FluidSystem::SetupExampleGenome()  {   // need to set up a demo genome
     m_FGenome.param[2][m_FGenome.default_damping]        = 1000  ;
     
     //Bond remodelling  m_FGenome.tanh_param[3][8];                 // lengthening/shortening
-    m_FGenome.tanh_param[m_FGenome.elastin][m_FGenome.l_a] = 0.0;   // y-shift
-    m_FGenome.tanh_param[m_FGenome.elastin][m_FGenome.l_b] = 0.0;   // y-scaling
-    m_FGenome.tanh_param[m_FGenome.elastin][m_FGenome.l_c] = 0.0;   // x-scaling
-    m_FGenome.tanh_param[m_FGenome.elastin][m_FGenome.l_d] = 0.0;   // x-shift
+    m_FGenome.tanh_param[m_FGenome.elastin][m_FGenome.l_a] = 1.008;   // y-shift
+    m_FGenome.tanh_param[m_FGenome.elastin][m_FGenome.l_b] = 0.01;   // y-scaling
+    m_FGenome.tanh_param[m_FGenome.elastin][m_FGenome.l_c] = 10.0;   // x-scaling
+    m_FGenome.tanh_param[m_FGenome.elastin][m_FGenome.l_d] = 7.0;   // x-shift
     
     m_FGenome.tanh_param[m_FGenome.elastin][m_FGenome.s_a] = 1.008; // strengthening/weakening  // mod_mul = 1.008+0.01*np.tanh(10*si2[i+1]-7)
-    m_FGenome.tanh_param[m_FGenome.elastin][m_FGenome.s_b] = 0.01;
+    m_FGenome.tanh_param[m_FGenome.elastin][m_FGenome.s_b] = 0.01;  // originally only s_abcd were set, all the others were 0.
     m_FGenome.tanh_param[m_FGenome.elastin][m_FGenome.s_c] = 10.0;
     m_FGenome.tanh_param[m_FGenome.elastin][m_FGenome.s_d] = 7.0;
     
-    m_FGenome.tanh_param[m_FGenome.collagen][m_FGenome.l_a] = 0.0;  // lengthening/shortening
-    m_FGenome.tanh_param[m_FGenome.collagen][m_FGenome.l_b] = 0.0;
-    m_FGenome.tanh_param[m_FGenome.collagen][m_FGenome.l_c] = 0.0;
-    m_FGenome.tanh_param[m_FGenome.collagen][m_FGenome.l_d] = 0.0;
+    m_FGenome.tanh_param[m_FGenome.collagen][m_FGenome.l_a] = 1.008;  // lengthening/shortening
+    m_FGenome.tanh_param[m_FGenome.collagen][m_FGenome.l_b] = 0.01;
+    m_FGenome.tanh_param[m_FGenome.collagen][m_FGenome.l_c] = 10.0;
+    m_FGenome.tanh_param[m_FGenome.collagen][m_FGenome.l_d] = 7.0;
     
-    m_FGenome.tanh_param[m_FGenome.collagen][m_FGenome.s_a] = 0.0;  // strengthening/weakening
-    m_FGenome.tanh_param[m_FGenome.collagen][m_FGenome.s_b] = 0.0;
-    m_FGenome.tanh_param[m_FGenome.collagen][m_FGenome.s_c] = 0.0;
-    m_FGenome.tanh_param[m_FGenome.collagen][m_FGenome.s_d] = 0.0;
+    m_FGenome.tanh_param[m_FGenome.collagen][m_FGenome.s_a] = 1.008;  // strengthening/weakening
+    m_FGenome.tanh_param[m_FGenome.collagen][m_FGenome.s_b] = 0.01;
+    m_FGenome.tanh_param[m_FGenome.collagen][m_FGenome.s_c] = 10.0;
+    m_FGenome.tanh_param[m_FGenome.collagen][m_FGenome.s_d] = 7.0;
     
-    m_FGenome.tanh_param[m_FGenome.apatite][m_FGenome.l_a] = 0.0;   // lengthening/shortening
-    m_FGenome.tanh_param[m_FGenome.apatite][m_FGenome.l_b] = 0.0;
-    m_FGenome.tanh_param[m_FGenome.apatite][m_FGenome.l_c] = 0.0;
-    m_FGenome.tanh_param[m_FGenome.apatite][m_FGenome.l_d] = 0.0;
+    m_FGenome.tanh_param[m_FGenome.apatite][m_FGenome.l_a] = 1.008;   // lengthening/shortening
+    m_FGenome.tanh_param[m_FGenome.apatite][m_FGenome.l_b] = 0.01;
+    m_FGenome.tanh_param[m_FGenome.apatite][m_FGenome.l_c] = 10.0;
+    m_FGenome.tanh_param[m_FGenome.apatite][m_FGenome.l_d] = 7.0;
     
-    m_FGenome.tanh_param[m_FGenome.apatite][m_FGenome.s_a] = 0.0;   // strengthening/weakening
-    m_FGenome.tanh_param[m_FGenome.apatite][m_FGenome.s_b] = 0.0;
-    m_FGenome.tanh_param[m_FGenome.apatite][m_FGenome.s_c] = 0.0;
-    m_FGenome.tanh_param[m_FGenome.apatite][m_FGenome.s_d] = 0.0;
+    m_FGenome.tanh_param[m_FGenome.apatite][m_FGenome.s_a] = 1.008;   // strengthening/weakening
+    m_FGenome.tanh_param[m_FGenome.apatite][m_FGenome.s_b] = 0.01;
+    m_FGenome.tanh_param[m_FGenome.apatite][m_FGenome.s_c] = 10.0;
+    m_FGenome.tanh_param[m_FGenome.apatite][m_FGenome.s_d] = 7.0;
     
 }
 
@@ -1626,6 +1630,8 @@ void FluidSystem::RunSimulation (){
 
 void FluidSystem::Run2Simulation(){
     printf("\n\n Run2Simulation(), m_FParams.debug=%i .", m_FParams.debug );
+    std::cerr << "\nRun2Simulation(), m_FParams.debug="<< m_FParams.debug <<std::flush;
+
     Init_FCURAND_STATE_CUDA ();
     auto old_begin = std::chrono::steady_clock::now();
     TransferPosVelVeval ();
@@ -1661,6 +1667,7 @@ void FluidSystem::Run2Simulation(){
     }
     */
     /////////
+    std::cerr << "\nRun2Simulation(), freeze loop" <<std::flush;
     for ( ; launchParams.file_num<launchParams.freeze_steps; launchParams.file_num+=100 ) {
         std::cout<<"\n\nfile_num="<<launchParams.file_num<<", of "<<launchParams.num_files<<"\n"<<std::flush;
         m_Debug_file=0;
@@ -1685,6 +1692,7 @@ void FluidSystem::Run2Simulation(){
     }
     setFreeze(false);                                                                                       // freeze=false => bonds can be broken now.
     printf("\n\nFreeze finished, starting normal Run ##############################################\n\n");
+    std::cerr << "\nRun2Simulation(), Freeze finished, starting normal Run #############################################" <<std::flush;
     //Run2PhysicalSort();
     
     for ( ; launchParams.file_num<launchParams.num_files; launchParams.file_num+=100 ) {
@@ -1722,6 +1730,7 @@ void FluidSystem::Run2Simulation(){
         
         //if (mActivePoints < 500 ){std::cout<<"\n(mActivePoints < 500) stopping. chk why I am loosing particles?"<<std::flush;  Exit();}        // temp chk for why I am loosing particles.
     }
+    std::cerr << "\nRun2Simulation(), Finished simulation, writing results." << std::flush;
     //launchParams.file_num++;
     
     TransferFromCUDA (); // includes cuFParams
@@ -1736,6 +1745,7 @@ void FluidSystem::Run2Simulation(){
     WriteSimParams ( final_outPath.c_str() );
     WriteGenome( final_outPath.c_str() );
     WriteSpecificationFile_fromLaunchParams( final_outPath.c_str() );
+    std::cerr << "\nRun2Simulation(), Finished" << std::flush;
 }
 
 

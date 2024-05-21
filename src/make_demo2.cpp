@@ -34,52 +34,24 @@ int main ( int argc, const char** argv )
     }
 
 //     //  redirect cout and cerr to files.
-//     stringstream outfile, errfile;
-//     outfile << "./" << output_folder;
-//     std::filesystem::create_directory( outfile.str() );
-//     outfile <<  "/make_demo2_output.txt";
+     stringstream outfile, errfile;
+     outfile << "./" << output_folder;
+     std::filesystem::create_directory( outfile.str() );
+     outfile <<  "/make_demo2_output.txt";
 //     errfile << "./" << output_folder << "/make_demo2_cerr.txt";
-//
+
 //     cout << "\ncout outfile = " << outfile.str() ;
-//     ofstream fileOut( outfile.str().c_str() );                                              // Opening the output file stream and associate it with
+//     ofstream fileOut( outfile.str().c_str() );                                            // Opening the output file stream and associate it with
 //     ofstream fileErr( errfile.str().c_str() );
-//
-//     cout << "\ncout outfile = " << outfile.str() << "\ncerr errfile = " << errfile.str();   // Redirecting cout to write to "output.txt"
+
+     cout << "\ncout outfile = " << outfile.str() << "\ncerr errfile = " << errfile.str();   // Redirecting cout to write to "output.txt"
 //     cout.rdbuf( fileOut.rdbuf() );
 //     cerr.rdbuf( fileErr.rdbuf() );
 
-
-
-
- /////
+/////
     fflush (stdout);
-    fclose (stdout);
-    freopen ("kernel1_output.txt", "w", stdout);
-    //kernel1<<<1,1>>>();
-//     cudaDeviceSynchronize();
-//     fflush (stdout);
-//     fclose (stdout);
-/////////
-
-//     /// REDIRECTION TO STRINGSTREAM
-//     std::stringstream ss;
-//
-//     std::streambuf* backup_cout = std::cout.rdbuf ();       // Redirect std::cout to a stringstream
-//     std::cout.rdbuf (ss.rdbuf ());
-//
-//     char buf[1024] = "";                                    // Redirect stdout to a buffer
-//     int backup_stdout = dup (fileno (stdout));
-//     freopen ("/dev/null", "w", stdout);
-//     setbuf (stdout, buf);
-//
-//     ss << buf;
-//     std::ofstream outFile;                                  // Write stringstream to file
-//     outFile.open ("printf_redirect.log");
-//     outFile << ss.str ();
-//     outFile.close ();
-
-//////////
-
+    //fclose (stdout);
+    freopen (outfile.str().c_str() /*"kernel1_output.txt"*/, "w", stdout);
 
 
     // Initialize
@@ -128,7 +100,6 @@ std::cout<<"\n\nmake_demo2 chk7, fluid.launchParams.debug="<<fluid.launchParams.
     fluid.TransferToCUDA (); 
     fluid.Run2Simulation ();
     
-
     cudaDeviceSynchronize();  // ? is this needed for cout redirect ?
 
     //std::cout<<"\n\nmake_demo2 chk3 "<<std::flush;
