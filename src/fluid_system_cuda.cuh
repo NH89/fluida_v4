@@ -91,7 +91,9 @@
         
         __device__ void find_potential_bond(int i, float3 ipos, uint _thisParticleBonds[6], float3 tpos, int gc, uint& _otherParticleIdx, uint& _otherParticleBondIdx, float& _bond_dsq, float max_len/*_sq*/);
         
-        __device__ void makeBond (uint thisParticleIdx, uint otherParticleIdx, uint bondIdx, uint otherParticleBondIdx, uint bondType /* elastin, collagen, apatite */);
+        __device__ void makeBond(uint thisParticleIdx, uint otherParticleIdx, uint bondIdx, uint bondType);
+        __device__ void remakeBond (uint thisParticleIdx, uint otherParticleIdx, uint bondIdx );
+
         __device__ int  atomicMakeBond(uint thisParticleIndx,  uint otherParticleIdx, uint bondIdx, uint otherParticleBondIndex, uint bond_type);
         __device__ int  insertNewParticle(uint new_particle_Idx, float3 newParticlePos, uint parentParticleIndx, uint bondIdx, uint secondParticleIdx, uint otherParticleBondIndex, uint bond_type[BONDS_PER_PARTICLE]);
         __device__ void find_closest_particle_per_axis(uint particle, float3 pos, uint neighbours[6]);
