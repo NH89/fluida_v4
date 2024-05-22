@@ -32,12 +32,17 @@ void FluidSystem::ReadGenome( const char * relativePath){
     ret=0;
     int i, j;
     for (i=0; i<num_genes1; i++ ) {
-        ret = std::fscanf(genes_file,"%i,%i,",&m_FGenome.mutability[i],&m_FGenome.delay[i] );
-        for(int j=0; j<NUM_GENES; j++)  ret += std::fscanf(genes_file,"%i,", &m_FGenome.sensitivity[i][j] );
-        for(int j=0; j<NUM_TF; j++) ret += std::fscanf(genes_file, "%i,%i,\t", &m_FGenome.secrete[i][j*2], &m_FGenome.secrete[i][j*2 + 1] );//(elemID, secretion_rate)
-        ret += std::fscanf(genes_file, "%i,\t\t", &m_FGenome.secrete[i][2*NUM_TF] );            //num active elements, NB sparse list, kernel will only read active elems.
-        for(int j=0; j<NUM_GENES; j++) ret += std::fscanf(genes_file, "%i,%i,\t", &m_FGenome.activate[i][j*2], &m_FGenome.activate[i][j*2 + 1] );//(elemID, other_geneID)
-        ret += std::fscanf(genes_file, "%i,\t\t \n", &m_FGenome.activate[i][2*NUM_GENES] );        //num active elements,
+        ret = std::fscanf(genes_file,"%i,%i,",                                          &m_FGenome.mutability[i],           &m_FGenome.delay[i] );
+
+        for(int j=0; j<NUM_GENES; j++)      ret += std::fscanf(genes_file,"%i,",        &m_FGenome.sensitivity[i][j] );
+        for(int j=0; j<NUM_TF; j++)         ret += std::fscanf(genes_file, "%i,%i,\t",  &m_FGenome.secrete[i][j*2],         &m_FGenome.secrete[i][j*2 + 1] );   //(elemID, secretion_rate)
+
+        ret += std::fscanf(genes_file, "%i,\t\t",                                       &m_FGenome.secrete[i][2*NUM_TF] );                                      //num active elements, NB sparse list, kernel will only read active elems.
+
+        for(int j=0; j<NUM_GENES; j++)      ret += std::fscanf(genes_file, "%i,%i,\t",  &m_FGenome.activate[i][j*2],        &m_FGenome.activate[i][j*2 + 1] );  //(elemID, other_geneID)
+
+        ret += std::fscanf(genes_file, "%i,\t\t \n",                                    &m_FGenome.activate[i][2*NUM_GENES] );                                  //num active elements,
+
         if (ret != (2 + NUM_GENES + NUM_TF*2 + 1 + NUM_GENES*2 + 1) ) {
             if (m_FParams.debug>1)std::cout << "\nvoid FluidSystem::ReadGenome, read failure !  gene number = " << i << ", ret = "<< ret <<"\n " << std::flush;
             fclose(genes_file);
@@ -51,9 +56,9 @@ void FluidSystem::ReadGenome( const char * relativePath){
     ret=0;
     ret += std::fscanf(genes_file,"\nTranscription Factors (tf_difusibility,tf_breakdown_rate) \n" );
     for(i=0; i<num_tf; i++) { 
-        ret += std::fscanf(genes_file,"\t%u,\t",&m_FGenome.tf_diffusability[i] );
-        ret += std::fscanf(genes_file,"%u,\t",&m_FGenome.tf_breakdown_rate[i] );
-        if (m_FParams.debug>1)std::cout <<"\t("<< m_FGenome.tf_diffusability[i] <<"," << m_FGenome.tf_breakdown_rate[i] <<"),"<< std::flush;
+        ret += std::fscanf(genes_file,"\t%u,\t",    &m_FGenome.tf_diffusability[i] );
+        ret += std::fscanf(genes_file,"%u,\t",      &m_FGenome.tf_breakdown_rate[i] );
+        if (m_FParams.debug>1)std::cout <<"\t("<<    m_FGenome.tf_diffusability[i] <<"," <<     m_FGenome.tf_breakdown_rate[i] <<"),"<< std::flush;
     }
     if (ret != NUM_TF*2)if (m_FParams.debug>1) std::cout << "\nvoid FluidSystem::ReadGenome, Transcription Factor read failure !  gene number = " << i << ", ret = "<< ret <<"\n " << std::flush;
     if (m_FParams.debug>1)std::cout << "\n" << i << " transcription factors read.\n" << std::flush;
@@ -66,7 +71,7 @@ void FluidSystem::ReadGenome( const char * relativePath){
     elastLim,\tdefault_rest_length,\tdefault_modulus,\tdefault_damping\n");
     
     for(i=0; i<3; i++){
-        for(j=0; j<12;j++) ret += std::fscanf(genes_file, "\t%f,\t", &m_FGenome.param[i][j] ); 
+        for(j=0; j<12;j++) ret += std::fscanf(genes_file, "\t%f,\t",                    &m_FGenome.param[i][j] );
         ret += std::fscanf(genes_file, "\n");
     }
     if (m_FParams.debug>1)std::cout << "\n" << i <<"*"<< j << " remodelling parameters read. ret = "<< ret <<"\n" << std::flush;
@@ -77,7 +82,7 @@ void FluidSystem::ReadGenome( const char * relativePath){
     ret += std::fscanf(genes_file, "\nl_a (y-shift),\t l_b (y-scaling),\t l_c (x-scaling),\t l_d (x-shift),\t\t s_a (y-shift),\t s_b (y-scaling),\t s_c (x-scaling),\t s_d (x-shift)\n");
     
     for(int i=0; i<3; i++){//[bond_type][t_param]
-        for(int j=0; j<8; j++)  ret += std::fscanf(genes_file, "\t%f,\t", &m_FGenome.tanh_param[i][j]);
+        for(int j=0; j<8; j++)  ret += std::fscanf(genes_file, "\t%f,\t",               &m_FGenome.tanh_param[i][j]);
         ret += std::fscanf(genes_file, "\n");
     }
     if (m_FParams.debug>1)std::cout << "\n" << i <<"*"<< j << " remodelling parameters read. ret = "<< ret <<"\n" << std::flush;

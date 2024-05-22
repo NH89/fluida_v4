@@ -599,7 +599,7 @@ void FluidSystem::CountingSortChangesCUDA ( ){
         if (m_FParams.debug>1)printf("\nCountingSortChangesCUDA2: change_list=%u,  densebuff_len[change_list]=%u, denselist_len[change_list]=%u ,\t\t threads=%u, numElem2=%u,  m_GridTotal=%u \t",
                change_list, densebuff_len[change_list], denselist_len[change_list], threads, numElem2,  m_GridTotal );
         cuCtxSynchronize ();
-        if(m_FParams.debug>0){
+        if(m_FParams.debug>2){
             uint fDenseList2[1000000] = {UINT_MAX};//TODO make this array size safe!  NB 10* num particles.
             CUdeviceptr*  _list2pointer = (CUdeviceptr*) &m_Fluid.bufC(FDENSE_LISTS_CHANGES)[change_list*sizeof(CUdeviceptr)]; 
                                                                                                                 // Get device pointer to FDENSE_LISTS_CHANGES[change_list].
@@ -644,7 +644,7 @@ void FluidSystem::ComputeForceCUDA (){
     //if (m_FParams.debug>1)printf("\n\nFluidSystem::ComputeForceCUDA (),  m_FParams.freeze=%s",(m_FParams.freeze==true) ? "true" : "false");
     void* args[3] = { &m_FParams.pnumActive ,  &m_FParams.freeze, &m_FParams.frame};
     cuCheck ( cuLaunchKernel ( m_Func[FUNC_COMPUTE_FORCE],  m_FParams.numBlocks, 1, 1, m_FParams.numThreads, 1, 1, 0, NULL, args, NULL), "ComputeForceCUDA", "cuLaunch", "FUNC_COMPUTE_FORCE", mbDebug);
-    if(m_FParams.debug>0){
+    if(m_FParams.debug>2){
         cuCheck( cuMemcpyDtoH ( m_Fluid.bufF3(FFORCE), m_Fluid.gpu(FFORCE),	sizeof(float3[mMaxPoints]) ), "ComputeForceCUDA", "cuMemcpyDtoH", "FFORCE", mbDebug);
         SaveFloat3Array( m_Fluid.bufF3(FFORCE), mMaxPoints, "ComputeForceCUDA__m_Fluid.bufI(FFORCE)3" );
     }
@@ -738,7 +738,7 @@ void FluidSystem::ComputeParticleChangesCUDA (){// Call each for dense list to e
     uint startNewPoints = mActivePoints + 1;
     //if (m_FParams.debug>-1)
         printf("\nFluidSystem::ComputeParticleChangesCUDA ()");
-    for (int change_list = 0; change_list<NUM_CHANGES;change_list++){
+    for (int change_list = 0; change_list<NUM_CHANGES; change_list++){
     //int change_list = 0; // TODO debug, chk one kernel at a time
         uint list_length = m_Fluid.bufI(FDENSE_LIST_LENGTHS_CHANGES)[change_list];  // num blocks and threads by list length
         //uint list_length = m_Fluid.bufI(FDENSE_BUF_LENGTHS_CHANGES)[change_list]; 
@@ -813,7 +813,7 @@ void FluidSystem::ComputeParticleChangesCUDA (){// Call each for dense list to e
     if (m_FParams.debug>-1) std::cout<<"\nFinished ComputeParticleChangesCUDA ()\n"<<std::flush;
 }
 
-void FluidSystem::CleanBondsCUDA (){
+void FluidSystem::CleanBondsCUDA (){   // Only for use in reciprocal branches.
     void* args[3] = { &m_FParams.pnumActive};
     cuCheck ( cuLaunchKernel ( m_Func[FUNC_CLEAN_BONDS],  m_FParams.numBlocks, 1, 1, m_FParams.numThreads, 1, 1, 0, NULL, args, NULL), "CleanBondsCUDA", "cuLaunch", "FUNC_CLEAN_BONDS", mbDebug);
 }

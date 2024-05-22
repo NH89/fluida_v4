@@ -691,13 +691,12 @@ extern "C" __global__ void computeGeneAction ( int pnum, int gene, uint list_len
     uint i = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;                                         // particle index
     if ( i >= list_len ) return;
     uint particle_index = fbuf.bufII(FDENSE_LISTS)[gene][i];
-    /*
-     * if (particle_index >= pnum){
-        printf("\ncomputeGeneAction: (particle_index >= pnum),  gene=%u, i=%u, list_len=%u, particle_index=%u, pnum=%u .\t",
-            gene, i, list_len, particle_index, pnum);
-    } */   
+    if (particle_index <= pnum  &&  particle_index%100==0){
+        printf("\ncomputeGeneAction: (particle_index >= pnum),  gene=%u, i=%u, list_len=%u, particle_index=%u, pnum=%u .\t",  gene, i, list_len, particle_index, pnum);
+    }
     int delay = (int)fbuf.bufI(FEPIGEN)[gene*fparam.maxPoints + particle_index];                                // Change in _epigenetic_ activation of this particle
-    //printf("\nDelay=%i, particle_index=%u\t", delay, particle_index);
+    if (particle_index <= pnum  &&  particle_index%100==0) printf("\nDelay=%i, particle_index=%u\t", delay, particle_index);
+
     if (0 < delay && delay < INT_MAX){                                                                          // (FEPIGEN==INT_MAX) => active & not counting down.
         fbuf.bufI(FEPIGEN)[gene*fparam.maxPoints + particle_index]--;                                           // (FEPIGEN<1) => inactivated @ insertParticles(..)
         if (delay==1  &&  gene<NUM_GENES && fbuf.bufI(FEPIGEN)[ (gene+1)*fparam.maxPoints + particle_index ] )  // If next gene is active, start count down to inactivate it.
@@ -706,16 +705,18 @@ extern "C" __global__ void computeGeneAction ( int pnum, int gene, uint list_len
     uint sensitivity[NUM_GENES];                                                                    // TF sensitivities : broadcast to threads
     #pragma unroll                                                                                  // speed up by eliminating loop logic.
     for(int j=0;j<NUM_GENES;j++) sensitivity[j]= fgenome.sensitivity[gene][j];                      // for each gene, its sensitivity to each TF or morphogen
-    /*
-     * if(i==list_len-1)printf("\ncomputeGeneAction Chk : gene=%u, i=%u, list_len=%u, particle_index=%u, pnum=%u ,  sensitivity[15]=%u.\t",
-            gene, i, list_len, particle_index, pnum, sensitivity[15]);
-            */                             // debug chk
+
+    if(i==list_len-1) printf("\ncomputeGeneAction Chk : gene=%u, i=%u, list_len=%u, particle_index=%u, pnum=%u ,  sensitivity[15]=%u.\t",
+            gene, i, list_len, particle_index, pnum, sensitivity[15]);                               // debug chk
+
+
     float activity=0;                                                                               // compute current activity of gene
     #pragma unroll
     for (int tf=0;tf<NUM_TF;tf++){                                                                  // read FCONC
         if(sensitivity[tf]!=0){                                                                     // skip reading unused fconc[]
-            activity +=  sensitivity[tf] * fbuf.bufI(FCONC)[particle_index + fparam.maxPoints*tf];
-        }                                                           
+            activity +=  sensitivity[tf] * fbuf.bufF(FCONC)[particle_index + fparam.maxPoints*tf];
+        }
+        if (particle_index%100==0) printf("\nparticle=i=%i, tf=%i, sensitivity[tf]=%i, fbuf.bufF(FCONC)[]=%f, activity=%f    ", i , tf, sensitivity[tf], fbuf.bufF(FCONC)[particle_index + fparam.maxPoints*tf], activity  );
     }
     // Compute actions                                             // Non-difusible TFs inc instructions to particle modification kernel wrt behaviour (cell type). 
     int numTF =  fgenome.secrete[gene][2*NUM_TF];                  // (i) secrete sparse list of TFs  => atomicAdd(ftemp...) to allow async gene kernels.
@@ -723,13 +724,15 @@ extern "C" __global__ void computeGeneAction ( int pnum, int gene, uint list_len
         int tf = fgenome.secrete[gene][j*2];
         int secretion_rate = fgenome.secrete[gene][j*2 + 1];
         atomicAdd( &ftemp.bufI(FCONC)[particle_index*NUM_TF +tf], secretion_rate*activity);
+        if (i==list_len-1) printf("\nparticle=i=%i TF=j=%i, tf=%i, secretion_rate=%i, activity=%f\t  secretion_rate*activity=%f", i, j, tf, secretion_rate, activity, secretion_rate*activity);
     }
-    int numLRNA = fgenome.activate[gene][2*NUM_GENES];             // (ii) secrete spare list long RNA => activate other genes.  NB threshold.
+    int numLRNA = fgenome.activate[gene][2*NUM_GENES];             // (ii) secrete sparse list long RNA => activate other genes.  NB threshold.
     for (int j=0;j<numLRNA;j++){
         int other_gene = fgenome.activate[gene][j*2];
         int threshold = fgenome.activate[gene][j*2 + 1];
         if(threshold<activity)                                                               // NB atomicAdd required because gene lists differ, so two threads _may_ try to write to the same gene.
         atomicAdd( &ftemp.bufI(FEPIGEN)[other_gene*fparam.maxPoints + particle_index], 1);   // what should be the initial state of other_gene when activated ?
+        if (i==list_len-1) printf("\nparticle=i=%i, gene=%i, threshold=%i, activity=%f    ", i , gene, threshold, activity  );
     }
 }
 
@@ -1122,9 +1125,6 @@ extern "C" __global__ void computeBondChanges ( int pnum, uint list_length, uint
     else if (fbufFEPIGEN[6*fparam.maxPoints]>0/*cartilage*/)  {tissueType =8;   bond_type[0]=1; bond_type[1]=1; bond_type[2]=1; bond_type[3]=1; }  // all collagen
     else                 /*areolar loose connective tissue*/  {tissueType =0;   bond_type[0]=0; bond_type[1]=0; bond_type[2]=0; bond_type[3]=0; }  // all weak elastin
     
-    
-    
-    
     //if (fparam.debug>2 && i%1000==0)printf(",%u,",i);
     
     if (fparam.debug>3 && i%100==0 ) {printf("\ncomputeBondChanges_4:i=%u,  bond_type=(%u,%u,%u,%u), fgenome.tanh_param[bond_type[bond]][fgenome.s_d]=%f  \t",
@@ -1135,9 +1135,11 @@ extern "C" __global__ void computeBondChanges ( int pnum, uint list_length, uint
     float strength[BONDS_PER_PARTICLE] = {__FLT_MAX__}; // FLT_MAX
     uint shorten = 0;
     
+    ///////////////////// Loop round bonds of this particle  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     for (uint bond=0; bond<BONDS_PER_PARTICLE; bond++, bond_uint_ptr+=DATA_PER_BOND, bond_flt_ptr+=DATA_PER_BOND ){
         if (fparam.debug>3 && i%100==0 ) {printf("\ncomputeBondChanges_5:i=%u,  bond=%u, 2nd reading bond_flt_ptr[rest_length]=%f ", i, bond, bond_flt_ptr[rest_length] );}
 
+        /////////////// For intact bonds - adjust rest length and modulus /////////////////////////////////////////////////////////////////////////////////////////////////////
         if (bond_flt_ptr[rest_length]>0){                                                           // NB (rest_length==0) => bond broken, do not modify.
             float strain_integrator_ = bond_flt_ptr[strain_integrator] / float(steps_per_InnerPhysicalLoop);
             float strain_sq_integrator_ = bond_flt_ptr[strain_sq_integrator] / float(steps_per_InnerPhysicalLoop);
@@ -1193,7 +1195,9 @@ extern "C" __global__ void computeBondChanges ( int pnum, uint list_length, uint
             */
 
         }
-        // "insert changes"
+
+
+        // "insert changes" //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         uint * fbufFGRIDCNT_CHANGES = fbuf.bufI(FGRIDCNT_CHANGES);
         int m = 1 + ((bond==0)&&(fbufFEPIGEN[7*fparam.maxPoints]>0/*muscle*/||fbufFEPIGEN[10*fparam.maxPoints]>0));        
                                                                                                     // i.e. if (bond==0 && fbufFEPIGEN[7]>0/*muscle*/) m=2 else m=1;
@@ -1216,8 +1220,7 @@ extern "C" __global__ void computeBondChanges ( int pnum, uint list_length, uint
                     &fbuf.bufII(FDENSE_LISTS)[2][particle_index]
                 );
             
-            //if (fparam.debug>2)printf(".");
-
+            ////////// change_0 = "heal(..)" i.e. repair broken bonds ///////////////
             atomicAdd ( &fbufFGRIDCNT_CHANGES[ 0*gridTot  + fbuf.bufI(FGCELL)[i] ], 1 );            //add to heal list //NB device-wide atomic
             bond_uint_ptr[change_type]+=1;                                                          // FELASTIDX [8]change-type binary indicator NB accumulates all changes for this bond
             /*
@@ -1266,7 +1269,7 @@ extern "C" __global__ void computeBondChanges ( int pnum, uint list_length, uint
                 bond_uint_ptr[change_type]+=128*m;
             }
         }*/
-    }
+    }/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     // particle removal lists, require all bonds to be weak. 
     uint * fbufFGRIDCNT_CHANGES = fbuf.bufI(FGRIDCNT_CHANGES);
@@ -1291,22 +1294,23 @@ extern "C" __global__ void computeBondChanges ( int pnum, uint list_length, uint
         printf("\ncomputeBondChanges():  particle_index=%u, bond_=%u  rest_len=%f, min_rest_len=%f",
                particle_index, bond_, fbuf.bufF(FELASTIDX)[i*BOND_DATA +rest_length], fgenome.param[bond_type[bond_]][fgenome.min_rest_length]  );
         
-        int m = 1 + ((bond_==0)&&(fbufFEPIGEN[7*fparam.maxPoints]>0|fbufFEPIGEN[10*fparam.maxPoints]>0));               // muscle or elast_lig
+        int m = 1 + ((bond_==0)&&(fbufFEPIGEN[7*fparam.maxPoints]>0|fbufFEPIGEN[10*fparam.maxPoints]>0));               // (bond[0])&&(muscle or elast_lig) => "m=2", else => "m=1".
         atomicAdd ( &fbufFGRIDCNT_CHANGES[ (2+m)*gridTot  + fbuf.bufI(FGCELL)[i] ], 1 );                                // add to shorten list
         bond_uint_ptr[change_type]+=8*m;
     }
     */
     
-    if (shorten!=0){    // This prevents necessary strong bonds being removed by particle "shortening" of weak bonds.
+    if (shorten!=0){    // This prevents necessary strong bonds being removed by particle "shortening" of weak bonds. ////////////////////////////////////////////////////////
         uint bond_ = 0;
         for (uint bond=0; bond<BONDS_PER_PARTICLE; bond++)if(strength[bond] < strength[bond_]) bond_=bond;              // find strongest bond
         if ((shorten>>bond_)&1) {                                                                                       // if the strongest bond is flagged for removal
             printf("\ncomputeBondChanges_9():  particle_index=%u, bond_=%u  rest_len=%f, min_rest_len=%f",
                particle_index, bond_, fbuf.bufF(FELASTIDX)[i*BOND_DATA +rest_length], fgenome.param[bond_type[bond_]][fgenome.min_rest_length]  );
         
-            int m = 1 + ((bond_==0)&&(fbufFEPIGEN[7*fparam.maxPoints]>0|fbufFEPIGEN[10*fparam.maxPoints]>0));           // muscle or elast_lig
-            atomicAdd ( &fbufFGRIDCNT_CHANGES[ (2+m)*gridTot  + fbuf.bufI(FGCELL)[i] ], 1 );                            // add to shorten list
-            bond_uint_ptr[change_type]+=8*m;
+            int m = 1 + ((bond_==0)&&(fbufFEPIGEN[7*fparam.maxPoints]>0|fbufFEPIGEN[10*fparam.maxPoints]>0));           // (bond[0])&&(muscle or elast_lig) => "m=2" i.e. collagen fibre, else => "m=1" i.e. not a continuous fibre.
+            atomicAdd ( &fbufFGRIDCNT_CHANGES[ (2+m)*gridTot  + fbuf.bufI(FGCELL)[i] ], 1 );                            // Add "1" to the 'shorten' list for "collagen fibre" or for "normal bond"
+                                                                                                                        // "(2+m)*gridTot" selects the correct region of buffer for the list.
+            bond_uint_ptr[change_type]+=8*m;                                                                            // adds binary 8 = 100 if not collagen fibre, or binary 8*2 = 1000 if not a continuous fibre.
         }
     }
 }
