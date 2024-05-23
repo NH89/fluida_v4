@@ -869,37 +869,37 @@ void FluidSystem::ReadSimParams ( const char * relativePath ) { // transcribe Si
     Vector3DF pplane_grav_dir, pvolmin, pvolmax, pinitmin, pinitmax;
 
     std::fseek(SimParams_file, 0, SEEK_SET);
-    int ret = std::fscanf ( SimParams_file, " m_Time = %f\n ", &m_Time );
+    int ret = std::fscanf ( SimParams_file, " m_Time = %f\n ", &m_Time );                                                      //std::cout << "\n"<<m_Time<<" ret = " << ret << std::flush;
     ret += std::fscanf ( SimParams_file, "m_DT = %f\n ", &m_DT );
-    ret += std::fscanf ( SimParams_file, "m_Param [ PSIMSCALE ] = %f\n ", &m_Param [ PSIMSCALE ] );
-    ret += std::fscanf ( SimParams_file, "m_Param [ PGRID_DENSITY ] = %f\n ", &m_Param [ PGRID_DENSITY ] ); // added
-    ret += std::fscanf ( SimParams_file, "m_Param [ PVISC ] = %f\n ", &m_Param [ PVISC ] );
-    ret += std::fscanf ( SimParams_file, "m_Param [ PSURFACE_TENSION ] = %f\n ", &m_Param [ PSURFACE_TENSION ] );
-    ret += std::fscanf ( SimParams_file, "m_Param [ PRESTDENSITY ] = %f\n ", &m_Param [ PRESTDENSITY ] );
-    ret += std::fscanf ( SimParams_file, "m_Param [ PSPACING ] = %f\n ", &m_Param [ PSPACING ] );
-    ret += std::fscanf ( SimParams_file, "m_Param [ PMASS ] = %f\n ", &m_Param [ PMASS ] );
-    ret += std::fscanf ( SimParams_file, "m_Param [ PRADIUS ] = %f\n ", &m_Param [ PRADIUS ] );
-    ret += std::fscanf ( SimParams_file, "m_Param [ PDIST ] = %f\n ", &m_Param [ PDIST ] );
-    ret += std::fscanf ( SimParams_file, "m_Param [ PSMOOTHRADIUS ] = %f\n ", &m_Param [ PSMOOTHRADIUS ] );
-    ret += std::fscanf ( SimParams_file, "m_Param [ PINTSTIFF ] = %f\n ", &m_Param [ PINTSTIFF ] );
-    ret += std::fscanf ( SimParams_file, "m_Param [ PEXTSTIFF ] = %f\n ", &m_Param [ PEXTSTIFF ] );
-    ret += std::fscanf ( SimParams_file, "m_Param [ PEXTDAMP ] = %f\n ", &m_Param [ PEXTDAMP ] );
-    ret += std::fscanf ( SimParams_file, "m_Param [ PACCEL_LIMIT ] = %f\n ", &m_Param [ PACCEL_LIMIT ] );
-    ret += std::fscanf ( SimParams_file, "m_Param [ PVEL_LIMIT ] = %f\n ", &m_Param [ PVEL_LIMIT ] );
-    ret += std::fscanf ( SimParams_file, "m_Param [ PGRAV ] = %f\n ", &m_Param [ PGRAV ] );
-    ret += std::fscanf ( SimParams_file, "m_Param [ PGROUND_SLOPE ] = %f\n ", &m_Param [ PGROUND_SLOPE ] );
-    ret += std::fscanf ( SimParams_file, "m_Param [ PFORCE_MIN ] = %f\n ", &m_Param [ PFORCE_MIN ] );
-    ret += std::fscanf ( SimParams_file, "m_Param [ PFORCE_MAX ] = %f\n ", &m_Param [ PFORCE_MAX ] );
-    ret += std::fscanf ( SimParams_file, "m_Param [ PFORCE_FREQ ] = %f\n ", &m_Param [ PFORCE_FREQ ] );
-    ret += std::fscanf ( SimParams_file, "m_Vec [ PPLANE_GRAV_DIR ].Set ( %f, %f, %f )\n ", &pplane_grav_dir.x, &pplane_grav_dir.y, &pplane_grav_dir.z );
-    ret += std::fscanf ( SimParams_file, "// Default sim config\n ");
-    ret += std::fscanf ( SimParams_file, "m_Param [ PGRIDSIZE ] = %f\n ", &m_Param [ PGRIDSIZE ] );
-    ret += std::fscanf ( SimParams_file, "m_Vec [ PVOLMIN ].Set ( %f, %f, %f )\n ", &pvolmin.x, &pvolmin.y, &pvolmin.z );
-    ret += std::fscanf ( SimParams_file, "m_Vec [ PVOLMAX ].Set ( %f, %f, %f )\n ", &pvolmax.x, &pvolmax.y, &pvolmax.z );
-    ret += std::fscanf ( SimParams_file, "m_Vec [ PINITMIN ].Set ( %f, %f, %f )\n ", &pinitmin.x, &pinitmin.y, &pinitmin.z );
-    ret += std::fscanf ( SimParams_file, "m_Vec [ PINITMAX ].Set ( %f, %f, %f )\n ", &pinitmax.x, &pinitmax.y, &pinitmax.z );
-    ret += std::fscanf ( SimParams_file, "m_Param [ PFORCE_MIN ] = %f\n ", &m_Param [ PFORCE_MIN ] );
-    ret += std::fscanf ( SimParams_file, "m_Param [ PFORCE_FREQ ] = %f\n ", &m_Param [ PFORCE_FREQ ] );
+    ret += std::fscanf ( SimParams_file, "m_Param [ PSIMSCALE ] = %f\n ", &m_Param [ PSIMSCALE ] );                            //std::cout << "\n"<<m_Param [ PSIMSCALE ]<<" ret = " << ret << std::flush;
+    ret += std::fscanf ( SimParams_file, "m_Param [ PGRID_DENSITY ] = %f\n ", &m_Param [ PGRID_DENSITY ] );                    //std::cout << "\n ret = " << ret << std::flush;
+    ret += std::fscanf ( SimParams_file, "m_Param [ PVISC ] = %f\n ", &m_Param [ PVISC ] );                                    //std::cout << "\n ret = " << ret << std::flush;
+    ret += std::fscanf ( SimParams_file, "m_Param [ PSURFACE_TENSION ] = %f\n ", &m_Param [ PSURFACE_TENSION ] );              //std::cout << "\nPSURFACE_TENSION ret = " << ret << std::flush;
+    ret += std::fscanf ( SimParams_file, "m_Param [ PRESTDENSITY ] = %f\n ", &m_Param [ PRESTDENSITY ] );                      //std::cout << "\n ret = " << ret << std::flush;
+    ret += std::fscanf ( SimParams_file, "m_Param [ PSPACING ] = %f\n ", &m_Param [ PSPACING ] );                              //std::cout << "\n ret = " << ret << std::flush;
+    ret += std::fscanf ( SimParams_file, "m_Param [ PMASS ] = %f\n ", &m_Param [ PMASS ] );                                    //std::cout << "\n ret = " << ret << std::flush;
+    ret += std::fscanf ( SimParams_file, "m_Param [ PRADIUS ] = %f\n ", &m_Param [ PRADIUS ] );                                //std::cout << "\n ret = " << ret << std::flush;
+    ret += std::fscanf ( SimParams_file, "m_Param [ PDIST ] = %f\n ", &m_Param [ PDIST ] );                                    //std::cout << "\n ret = " << ret << std::flush;
+    ret += std::fscanf ( SimParams_file, "m_Param [ PSMOOTHRADIUS ] = %f\n ", &m_Param [ PSMOOTHRADIUS ] );                    //std::cout << "\nPSMOOTHRADIUS ret = " << ret << std::flush;
+    ret += std::fscanf ( SimParams_file, "m_Param [ PINTSTIFF ] = %f\n ", &m_Param [ PINTSTIFF ] );                            //std::cout << "\n ret = " << ret << std::flush;
+    ret += std::fscanf ( SimParams_file, "m_Param [ PEXTSTIFF ] = %f\n ", &m_Param [ PEXTSTIFF ] );                            //std::cout << "\n ret = " << ret << std::flush;
+    ret += std::fscanf ( SimParams_file, "m_Param [ PEXTDAMP ] = %f\n ", &m_Param [ PEXTDAMP ] );                              //std::cout << "\n ret = " << ret << std::flush;
+    ret += std::fscanf ( SimParams_file, "m_Param [ PACCEL_LIMIT ] = %f\n ", &m_Param [ PACCEL_LIMIT ] );                      //std::cout << "\n ret = " << ret << std::flush;
+    ret += std::fscanf ( SimParams_file, "m_Param [ PVEL_LIMIT ] = %f\n ", &m_Param [ PVEL_LIMIT ] );                          //std::cout << "\n ret = " << ret << std::flush;
+    ret += std::fscanf ( SimParams_file, "m_Param [ PGRAV ] = %f\n ", &m_Param [ PGRAV ] );                                    //std::cout << "\n ret = " << ret << std::flush;
+    ret += std::fscanf ( SimParams_file, "m_Param [ PGROUND_SLOPE ] = %f\n ", &m_Param [ PGROUND_SLOPE ] );                    //std::cout << "\nPGROUND_SLOPE ret = " << ret << std::flush;
+    ret += std::fscanf ( SimParams_file, "m_Param [ PFORCE_MIN ] = %f\n ", &m_Param [ PFORCE_MIN ] );                          //std::cout << "\n ret = " << ret << std::flush;
+    ret += std::fscanf ( SimParams_file, "m_Param [ PFORCE_MAX ] = %f\n ", &m_Param [ PFORCE_MAX ] );                          //std::cout << "\n ret = " << ret << std::flush;
+    ret += std::fscanf ( SimParams_file, "m_Param [ PFORCE_FREQ ] = %f\n ", &m_Param [ PFORCE_FREQ ] );                        //std::cout << "\n ret = " << ret << std::flush;
+    ret += std::fscanf ( SimParams_file, "m_Vec [ PPLANE_GRAV_DIR ].Set ( %f, %f, %f )\n ", &pplane_grav_dir.x, &pplane_grav_dir.y, &pplane_grav_dir.z );      //std::cout << "\n ret = " << ret << std::flush;
+    ret += std::fscanf ( SimParams_file, "// Default sim config\n ");                                                          //std::cout << "\n ret = " << ret << std::flush;
+    ret += std::fscanf ( SimParams_file, "m_Param [ PGRIDSIZE ] = %f\n ", &m_Param [ PGRIDSIZE ] );                            //std::cout << "\nPGRIDSIZE ret = " << ret << std::flush;
+    ret += std::fscanf ( SimParams_file, "m_Vec [ PVOLMIN ].Set ( %f, %f, %f )\n ", &pvolmin.x, &pvolmin.y, &pvolmin.z );      //std::cout << "\n ret = " << ret << std::flush;
+    ret += std::fscanf ( SimParams_file, "m_Vec [ PVOLMAX ].Set ( %f, %f, %f )\n ", &pvolmax.x, &pvolmax.y, &pvolmax.z );      //std::cout << "\n ret = " << ret << std::flush;
+    ret += std::fscanf ( SimParams_file, "m_Vec [ PINITMIN ].Set ( %f, %f, %f )\n ", &pinitmin.x, &pinitmin.y, &pinitmin.z );  //std::cout << "\n ret = " << ret << std::flush;
+    ret += std::fscanf ( SimParams_file, "m_Vec [ PINITMAX ].Set ( %f, %f, %f )\n ", &pinitmax.x, &pinitmax.y, &pinitmax.z );  //std::cout << "\n ret = " << ret << std::flush;
+    ret += std::fscanf ( SimParams_file, "m_Param [ PFORCE_MIN ] = %f\n ", &m_Param [ PFORCE_MIN ] );                          //std::cout << "\nPFORCE_MIN ret = " << ret << std::flush;
+    ret += std::fscanf ( SimParams_file, "m_Param [ PFORCE_FREQ ] = %f\n ", &m_Param [ PFORCE_FREQ ] );                        //std::cout << "\nPFORCE_FREQ ret = " << ret << std::flush;
     ret += std::fscanf ( SimParams_file, "m_Param [ PGROUND_SLOPE ] = %f\n ", &m_Param [ PGROUND_SLOPE ] );
 
     if ( ret != 41 ) {
@@ -1288,11 +1288,11 @@ void FluidSystem::ReadSpecificationFile ( const char * relativePath ){
     ret += std::fscanf ( SpecFile, "gene_activity = %c\n ", &launchParams.gene_activity );
     ret += std::fscanf ( SpecFile, "remodelling = %c\n ", &launchParams.remodelling );
     ret += std::fscanf ( SpecFile, "read_genome = %c\n ", &launchParams.read_genome );
+    ret += std::fscanf ( SpecFile, "create_demo = %c\n ", &launchParams.create_demo );
     ret += std::fscanf ( SpecFile, "\n");
     
     ret += std::fscanf ( SpecFile, "actuation_factor = %f\n ", &launchParams.actuation_factor );
     ret += std::fscanf ( SpecFile, "actuation_period = %f\n ", &launchParams.actuation_period );
-    
     ret += std::fscanf ( SpecFile, "\n");
  
     m_FParams.debug = launchParams.debug ;
@@ -1407,6 +1407,7 @@ void FluidSystem::WriteExampleSpecificationFile ( const char * relativePath ){ /
     ret += std::fprintf ( SpecFile, "gene_activity = %c\n ", launchParams.gene_activity );
     ret += std::fprintf ( SpecFile, "remodelling = %c\n ", launchParams.remodelling );
     ret += std::fprintf ( SpecFile, "read_genome = %c\n ", launchParams.read_genome );
+    ret += std::fprintf ( SpecFile, "create_demo = %c\n ", launchParams.create_demo );
     ret += std::fprintf ( SpecFile, "\n");
     
     ret += std::fprintf ( SpecFile, "actuation_factor = %f\n ", m_Param[PACTUATION_FACTOR] );//  launchParams.actuation_factor );
@@ -1523,6 +1524,7 @@ void FluidSystem::WriteSpecificationFile_fromLaunchParams ( const char * relativ
     ret += std::fprintf ( SpecFile, "gene_activity = %c\n ", launchParams.gene_activity );
     ret += std::fprintf ( SpecFile, "remodelling = %c\n ", launchParams.remodelling );
     ret += std::fprintf ( SpecFile, "read_genome = %c\n ", launchParams.read_genome );
+    ret += std::fprintf ( SpecFile, "create_demo = %c\n ", launchParams.create_demo );
     
     ret += std::fprintf ( SpecFile, "\n");
     

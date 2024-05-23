@@ -27,82 +27,59 @@ int main ( int argc, const char** argv )
         auto in_time_t = std::chrono::system_clock::to_time_t(now);
         std::stringstream datetime;
         datetime << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d_%X");
-        //std::ofstream myFile2("report_" + datetime.str() + ".csv");
+
         sprintf ( input_folder, "%s", argv[1] );
         sprintf ( output_folder, "%s_%s", argv[2], datetime.str().c_str() );                // Add timestamp to output folder name.
         printf ( "input_folder = %s , output_folder = %s\n", input_folder, output_folder );
     }
-
-//     //  redirect cout and cerr to files.
-     stringstream outfile, errfile;
-     outfile << "./" << output_folder;
-     std::filesystem::create_directory( outfile.str() );
-     outfile <<  "/make_demo2_output.txt";
-//     errfile << "./" << output_folder << "/make_demo2_cerr.txt";
-
-//     cout << "\ncout outfile = " << outfile.str() ;
-//     ofstream fileOut( outfile.str().c_str() );                                            // Opening the output file stream and associate it with
-//     ofstream fileErr( errfile.str().c_str() );
-
-     cout << "\ncout outfile = " << outfile.str() << "\ncerr errfile = " << errfile.str();   // Redirecting cout to write to "output.txt"
-//     cout.rdbuf( fileOut.rdbuf() );
-//     cerr.rdbuf( fileErr.rdbuf() );
-
-/////
+    if(mkdir(output_folder, 0755) == -1) cerr << "\nError :  failed to create output_folder.\n" << strerror(errno) << endl;
+    else cout << "output_folder created\n";                                                 // NB Folder access setting: 0755 = rwx owner, rx for others.
+    stringstream outfile;
+    outfile << "./" << output_folder <<  "/make_demo2_output.txt";
+    cout << "\ncout outfile = " << outfile.str();
     fflush (stdout);
-    //fclose (stdout);
-    freopen (outfile.str().c_str() /*"kernel1_output.txt"*/, "w", stdout);
+    freopen (outfile.str().c_str(), "w", stdout);                                           // Redirecting cout to write to "output.txt"
 
-
-    // Initialize
-    cuInit ( 0 );
+    cuInit ( 0 );                                                                           // Initialize
     int deviceCount = 0;
     cuDeviceGetCount ( &deviceCount );
     if ( deviceCount == 0 ) {
         printf ( "There is no device supporting CUDA.\n" );
         exit ( 0 );
     }
-cout << "\nmake_demo2: chk_2 "<<std::flush;
     CUdevice cuDevice;
     cuDeviceGet ( &cuDevice, 0 );
     CUcontext cuContext;
     cuCtxCreate ( &cuContext, 0, cuDevice );
-cout << "\nmake_demo2: chk_3 "<<std::flush;
     FluidSystem fluid;
 
-fluid.launchParams.debug = 3;
-cout << "\nmake_demo2: chk_4 "<<std::flush;
+    fluid.launchParams.debug = 3;                                                           // High debug setting, for fluid.InitializeCuda ().
     fluid.InitializeCuda ();
-    //std::cout<<"\n\nmake_demo2 chk0,"<<std::flush;
-cout << "\nmake_demo2: chk_5 , input_folder : "<<input_folder<<std::flush;
-    fluid.ReadSpecificationFile ( input_folder );
+    fluid.ReadSpecificationFile ( input_folder );                                           // Debug reset to value in SpecificationFile.
 
+    cout <<"\nfluid.launchParams.paramsPath = "<< fluid.launchParams.paramsPath ;
+    cout <<"\nfluid.launchParams.pointsPath = "<< fluid.launchParams.pointsPath ;
 
-std::cout<<"\n\nmake_demo2 chk6, fluid.launchParams.debug="<<fluid.launchParams.debug<<", fluid.launchParams.genomePath=" <<fluid.launchParams.genomePath  << ",  fluid.launchParams.spacing="<<fluid.launchParams.spacing<<std::flush;
-    
-    for(int i=0; i<256; i++){fluid.launchParams.paramsPath[i] = input_folder[i];}
-    for(int i=0; i<256; i++){fluid.launchParams.pointsPath[i] = input_folder[i];}
-    //for(int i=0; i<256; i++){fluid.launchParams.genomePath[i] = input_folder[i];} // obtained from SpecificationFile.txt above.
-    if(argc==3)for(int i=0; i<256; i++){fluid.launchParams.outPath[i] = output_folder[i];}
-    
-    if(mkdir(output_folder, 0755) == -1) cerr << "\nError :  failed to create output_folder.\n" << strerror(errno) << endl;
-    else cout << "output_folder created\n"; // NB 0755 = rwx owner, rx for others.
-    
-std::cout<<"\n\nmake_demo2 chk7, fluid.launchParams.debug="<<fluid.launchParams.debug<<", fluid.launchParams.genomePath=" <<fluid.launchParams.genomePath  << ",  fluid.launchParams.spacing="<<fluid.launchParams.spacing<<std::flush;
+    if (fluid.launchParams.debug>0) std::cout<<"\n\nmake_demo2 chk6, fluid.launchParams.debug="<<fluid.launchParams.debug<<", fluid.launchParams.genomePath=" <<fluid.launchParams.genomePath  << ",  fluid.launchParams.spacing="<<fluid.launchParams.spacing<<std::flush;
 
+    for(int i=0; i<256; i++){fluid.launchParams.outPath[i]    = output_folder[i];}
 
-    fluid.WriteDemoSimParams(           // Generates the simulation from data previously loaded from SpecificationFile.txt .
-        fluid.launchParams.outPath/*paramsPath*/, GPU_DUAL, CPU_YES, fluid.launchParams.num_particles, fluid.launchParams.spacing, fluid.launchParams.x_dim, fluid.launchParams.y_dim, fluid.launchParams.z_dim, fluid.launchParams.demoType, fluid.launchParams.simSpace, fluid.launchParams.debug
-    ); /*const char * relativePath*/ 
-    //std::cout<<"\n\nmake_demo2 chk2 "<<std::flush;
+    if (fluid.launchParams.debug>0) std::cout<<"\n\nmake_demo2 chk7, fluid.launchParams.debug="<<fluid.launchParams.debug<<", fluid.launchParams.genomePath=" <<fluid.launchParams.genomePath  << ",  fluid.launchParams.spacing="<<fluid.launchParams.spacing<<std::flush;
+
+    if(fluid.launchParams.create_demo=='y'){
+        fluid.WriteDemoSimParams(                                                           // Generates the simulation from data previously loaded from SpecificationFile.txt .
+            fluid.launchParams.outPath/*paramsPath*/, GPU_DUAL, CPU_YES, fluid.launchParams.num_particles, fluid.launchParams.spacing, fluid.launchParams.x_dim, fluid.launchParams.y_dim, fluid.launchParams.z_dim, fluid.launchParams.demoType, fluid.launchParams.simSpace, fluid.launchParams.debug
+        );
+    }else{
+        fluid.ReadSimParams ( fluid.launchParams.paramsPath);
+        fluid.ReadPointsCSV2( fluid.launchParams.pointsPath, GPU_DUAL, CPU_YES );
+    }
     uint num_particles_start=fluid.ActivePoints();
     
     fluid.TransferToCUDA (); 
     fluid.Run2Simulation ();
-    
-    cudaDeviceSynchronize();  // ? is this needed for cout redirect ?
+    cudaDeviceSynchronize();
 
-    //std::cout<<"\n\nmake_demo2 chk3 "<<std::flush;
     fluid.WriteResultsCSV(input_folder, output_folder, num_particles_start);// NB post-slurm script to (i) cat results.csv files, (ii)tar-gzip and ftp folders to recipient.
     
     size_t   free1, free2, total;
@@ -114,9 +91,7 @@ std::cout<<"\n\nmake_demo2 chk7, fluid.launchParams.debug="<<fluid.launchParams.
     
     cudaMemGetInfo(&free2, &total);
     printf("\nmake_demo2: After cuCtxDestroy(cuContext): free=%lu, total=%lu, released=%lu.\n",free2,total,(free2-free1) );
-    
-    printf ( "\nClosed make_demo2.\n" );
-
+    printf("\nClosed make_demo2.\n" );
 
     fflush (stdout);
     fclose (stdout);
