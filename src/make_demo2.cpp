@@ -59,6 +59,7 @@ int main ( int argc, const char** argv )
 
     cout <<"\nfluid.launchParams.paramsPath = "<< fluid.launchParams.paramsPath ;
     cout <<"\nfluid.launchParams.pointsPath = "<< fluid.launchParams.pointsPath ;
+    cout <<"\nfluid.launchParams.genomePath = "<< fluid.launchParams.genomePath ;
 
     if (fluid.launchParams.debug>0) std::cout<<"\n\nmake_demo2 chk6, fluid.launchParams.debug="<<fluid.launchParams.debug<<", fluid.launchParams.genomePath=" <<fluid.launchParams.genomePath  << ",  fluid.launchParams.spacing="<<fluid.launchParams.spacing<<std::flush;
 
@@ -71,8 +72,11 @@ int main ( int argc, const char** argv )
             fluid.launchParams.outPath/*paramsPath*/, GPU_DUAL, CPU_YES, fluid.launchParams.num_particles, fluid.launchParams.spacing, fluid.launchParams.x_dim, fluid.launchParams.y_dim, fluid.launchParams.z_dim, fluid.launchParams.demoType, fluid.launchParams.simSpace, fluid.launchParams.debug
         );
     }else{
-        fluid.ReadSimParams ( fluid.launchParams.paramsPath);
-        fluid.ReadPointsCSV2( fluid.launchParams.pointsPath, GPU_DUAL, CPU_YES );
+        fluid.ReadSimParams (   fluid.launchParams.paramsPath);
+        fluid.ReadGenome(       fluid.launchParams.genomePath);
+        fluid.ReadPointsCSV2(   fluid.launchParams.pointsPath, GPU_DUAL, CPU_YES );         // NB Also transfers params, genome and points to gpu.
+        fluid.TransferFromCUDA();
+        fluid.SavePointsCSV2(fluid.launchParams.outPath, -1 );// to check points from GPU.
     }
     uint num_particles_start=fluid.ActivePoints();
     
