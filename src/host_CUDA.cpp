@@ -667,6 +667,15 @@ void FluidSystem::ComputeGenesCUDA (){  // for each gene, call a kernel wih the 
             cuCheck ( cuLaunchKernel ( m_Func[FUNC_COMPUTE_GENE_ACTION],  numBlocks, 1, 1, numThreads, 1, 1, 0, NULL, args, NULL), "ComputeGenesCUDA", "cuLaunch", "FUNC_COMPUTE_GENE_ACTION", mbDebug);
         }
     }
+    if(launchParams.debug>0){
+        cuCheck(cuCtxSynchronize(), "ComputeGenesCUDA", "cuCtxSynchronize", "After FUNC_COMPUTE_GENE_ACTION & before FUNC_TALLY_GENE_ACTION", mbDebug);
+        TransferFromCUDA ();
+        m_Debug_file++;
+        SavePointsCSV2 (  launchParams.outPath, m_Frame+m_Debug_file, "FluidSystem::ComputeGenesCUDA()_1" );
+        std::cout << "\n\nRun2Remodelling() Chk1, saved "<<launchParams.outPath<< m_Frame+m_Debug_file <<".csv  After kernel COMPUTE_GENE_ACTION();\n"<<std::flush;
+        //TransferFromTempCUDA(int buf_id, int sz );
+    }
+
     cuCheck(cuCtxSynchronize(), "ComputeGenesCUDA", "cuCtxSynchronize", "After FUNC_COMPUTE_GENE_ACTION & before FUNC_TALLY_GENE_ACTION", mbDebug);
     for (int gene=0;gene<NUM_GENES;gene++) {
         uint list_length = m_Fluid.bufI(FDENSE_LIST_LENGTHS)[gene];

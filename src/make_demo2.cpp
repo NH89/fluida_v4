@@ -76,7 +76,7 @@ int main ( int argc, const char** argv )
         fluid.ReadGenome(       fluid.launchParams.genomePath);
         fluid.ReadPointsCSV2(   fluid.launchParams.pointsPath, GPU_DUAL, CPU_YES );         // NB Also transfers params, genome and points to gpu.
         fluid.TransferFromCUDA();
-        fluid.SavePointsCSV2(fluid.launchParams.outPath, -1 );// to check points from GPU.
+        fluid.SavePointsCSV2(fluid.launchParams.outPath, -1, "make_demo2.cpp" );// to check points from GPU.
     }
     uint num_particles_start=fluid.ActivePoints();
     

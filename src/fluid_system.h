@@ -287,7 +287,8 @@
 		void SaveFloat3Array( float3* array, int numElem1, const char * relativePath );
         
         void SavePointsVTP2 ( const char * relativePath, int frame );
-        void SavePointsCSV2 ( const char * relativePath, int frame );
+		void SavePointsCSV2 ( const char * relativePath, int frame);
+        void SavePointsCSV2 ( const char * relativePath, int frame, const char * fn_name );
         void ReadSimParams ( const char * relativePath );    // path to folder containing simparams and .csv files
         void WriteDemoSimParams ( const char * relativePath, int gpu_mode, int cpu_mode, uint num_particles, float spacing, float x_dim, float y_dim, float z_dim, uint demoType, uint simSpace, uint debug); // Write standard demo to file, as demonstration of file format. 
         void WriteSimParams ( const char * relativePath );

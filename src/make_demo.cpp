@@ -14,6 +14,7 @@ int main ( int argc, const char** argv )
     printf ( "\n\n### Starting Morphogenesis  \"make_demo\" ### \n" );
     uint num_particles, demoType, simSpace;
     float spacing, x_dim, y_dim, z_dim;
+    printf("\nargc = %i", argc);
     if ( argc != 8 && argc !=1 ) {
         printf ( "usage: make_demo num_particles spacing x_dim y_dim z_dim \n \
         demoType(0:free falling, 1: remodelling & actuation, 2: diffusion & epigenetics.) \n \
@@ -21,7 +22,7 @@ int main ( int argc, const char** argv )
             6:Morphogenesis small demo  7:use SpecificationFile.txt  8:parameter sweep default )\n" );
         return 0;
     } else if (argc == 8) {
-        printf ( "\nargc == 8");
+        printf ( "\nargc == 8\n");
 
         num_particles = atoi(argv[1]);
         printf ( "num_particles = %u\n", num_particles );
@@ -45,7 +46,7 @@ int main ( int argc, const char** argv )
         printf ( "simSpace = %u, (0:regression test, 1:tower, 2:wavepool, 3:small dam break, 4:dual-wavepool, 5: microgravity, \n \
             6:Morphogenesis small demo  7:use SpecificationFile.txt  8:parameter sweep default )\n\n", simSpace);
     }  else {
-        printf ( "\nargc == 1");
+        printf ( "\nargc == 1\n");
 
         num_particles = 4000;
         printf ( "num_particles = %u\n", num_particles );
@@ -75,7 +76,7 @@ int main ( int argc, const char** argv )
     
     std::cout <<"\nmake_demo : launchParams.read_genome = " << fluid.launchParams.read_genome <<",\t  launchParams.genomePath = "<<  fluid.launchParams.genomePath<<std::endl<<std::flush;
 
-    fluid.WriteDemoSimParams("./demo", GPU_OFF, CPU_YES , num_particles, spacing, x_dim, y_dim, z_dim, demoType, simSpace, debug);/*const char * relativePath*/ 
+    fluid.WriteDemoSimParams("./demo", GPU_OFF, CPU_YES , num_particles, spacing, x_dim, y_dim, z_dim, demoType, simSpace, debug);/*const char * relativePath*/
     
     if(argc !=1){                                           // i.e not relying on defaults in simspace 8
     fluid.launchParams.num_particles    = num_particles;    // Write default values to fluid.launchParams...
@@ -98,6 +99,7 @@ int main ( int argc, const char** argv )
     fluid.launchParams.gene_activity    = 'n';
     fluid.launchParams.remodelling      = 'n';
     }
+
  
     std::string paramsPath("demo/SimParams.txt");     // Set file paths relative to data/ , where SpecfileBatchGenerator will be run.
     std::string pointsPath("demo");

@@ -94,7 +94,7 @@ std::cout <<"\nchk load_sim_1.0\n"<<std::flush;
     auto old_begin = std::chrono::steady_clock::now();
     
     fluid.TransferFromCUDA ();
-    fluid.SavePointsCSV2 ( outPath, file_num );
+    fluid.SavePointsCSV2 ( outPath, file_num, "load_sim.cpp_1" );
     if(save_vtp=='y') fluid.SavePointsVTP2( outPath, file_num);
     file_num++;
     
@@ -115,7 +115,7 @@ std::cout <<"\nchk load_sim_2.0\n"<<std::flush;
         fluid.Run (outPath, file_num, (debug>4), (gene_activity=='y'), (remodelling=='y') );
         fluid.TransferPosVelVeval (); // Freeze movement until heal() has formed bonds, over 1st n timesteps.
         if(save_csv=='y'||save_vtp=='y') fluid.TransferFromCUDA ();
-        if(save_csv=='y') fluid.SavePointsCSV2 ( outPath, file_num+90);
+        if(save_csv=='y') fluid.SavePointsCSV2 ( outPath, file_num+90, "load_sim.cpp_2");
         if(save_vtp=='y') fluid.SavePointsVTP2 ( outPath, file_num+90);
         file_num+=100;
     }
@@ -134,7 +134,7 @@ std::cout <<"\nchk load_sim_2.0\n"<<std::flush;
         // TODO flip mutex
         auto begin = std::chrono::steady_clock::now();
         if(save_csv=='y'||save_vtp=='y') fluid.TransferFromCUDA ();
-        if(save_csv=='y') fluid.SavePointsCSV2 ( outPath, file_num+90);
+        if(save_csv=='y') fluid.SavePointsCSV2 ( outPath, file_num+90, "load_sim.cpp_3");
         if(save_vtp=='y') fluid.SavePointsVTP2 ( outPath, file_num+90);
         cout << "\n File# " << file_num << ". " << std::flush;
         

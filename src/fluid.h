@@ -362,7 +362,7 @@
     struct FGenome{   // ## currently using fixed size genome for efficiency. NB Particle data size depends on genome size.
         uint mutability[NUM_GENES];
         uint delay[NUM_GENES];
-        uint sensitivity[NUM_GENES][NUM_GENES];     // for each gene, its sensitivity to each TF or morphogen
+        uint sensitivity[NUM_GENES][NUM_TF];        // for each gene, its sensitivity to each TF or morphogen
         uint tf_diffusability[NUM_TF];              // for each transcription_factor, the diffusion and breakdown rates of its TF.
         uint tf_breakdown_rate[NUM_TF];
                                                     // sparse lists final entry = num elem, other entries (elem_num, param)

@@ -695,7 +695,7 @@ extern "C" __global__ void computeGeneAction ( int pnum, int gene, uint list_len
     uint i = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;                                         // particle index
     if ( i >= list_len ) return;
     uint particle_index = fbuf.bufII(FDENSE_LISTS)[gene][i];
-    uint particle_ID    = fbuf.bufI(FPARTICLE_ID)[i];
+    uint particle_ID    = fbuf.bufI(FPARTICLE_ID)[particle_index];
                                                                                                             //if (particle_index <= pnum  &&  particle_index%100==0){
                                                                                                             //    printf("\ncomputeGeneAction: (particle_index >= pnum),  gene=%u, i=%u, list_len=%u, particle_index=%u, pnum=%u .\t",  gene, i, list_len, particle_index, pnum);
                                                                                                             //}
@@ -734,7 +734,7 @@ extern "C" __global__ void computeGeneAction ( int pnum, int gene, uint list_len
     for (int j=0;j<numTF;j++){
         int tf = fgenome.secrete[gene][j*2];
         int secretion_rate = fgenome.secrete[gene][j*2 + 1];
-        atomicAdd( &ftemp.bufF(FCONC)[particle_index*NUM_TF +tf], secretion_rate*activity);       // NB writing to ftemp, but rea from fbuf, so _should_ be no race condition.
+        atomicAdd( &ftemp.bufF(FCONC)[particle_index + fparam.maxPoints*tf ], secretion_rate*activity);  // *NUM_TF     // NB writing to ftemp, but rea from fbuf, so _should_ be no race condition.
         //ftemp.bufI(FCONC)[particle_index*NUM_TF +tf] += secretion_rate*activity;
                                                                                                             if (activity*secretion_rate!=0) {
                                                                                                                 printf("\nID=%i, particle=i=%i TF=j=%i, tf=%i, secretion_rate=%i, activity=%f\t  secretion_rate*activity=%f",
