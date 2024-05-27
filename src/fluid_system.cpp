@@ -8,6 +8,7 @@
 #include <cstring>
 #include "cutil_math.h"
 #include "fluid_system.h"
+#include <cmath>
 
 
 //bool cuCheck (CUresult launch_stat, const char* method, const char* apicall, const char* arg, bool bDebug);
@@ -585,6 +586,7 @@ if (m_FParams.debug>1)std::cout << "\n SetupAddVolumeMorphogenesis2 \t" << std::
 
     Vector3DF volV3DF = max-min;    
     int num_particles_to_make = 8 * int(volV3DF.x*volV3DF.y*volV3DF.z);// 27 * //int(volV3DF.x*volV3DF.y*volV3DF.z / spacing*spacing*spacing);
+    num_particles_to_make = fmax(num_particles_to_make, launchParams.num_particles);
     srand((unsigned int)time(NULL));
 
     if (m_FParams.debug>1)cout<<"\nSetupAddVolumeMorphogenesis2: num_particles_to_make="<<num_particles_to_make<<",   min=("<<min.x<<","<<min.y<<","<<min.z<<"), max=("<<max.x<<","<<max.y<<","<<max.z<<") "<<std::flush;
@@ -1013,7 +1015,7 @@ void FluidSystem::Run2GeneAction(){//NB gene sorting occurs within Run2PhysicalS
     ComputeDiffusionCUDA();
     cuCheck(cuCtxSynchronize(), "Run", "cuCtxSynchronize", "After ComputeDiffusionCUDA", mbDebug);
     
-     ComputeGenesCUDA(); // NB (i)Epigenetic countdown, (ii) GRN gene regulatory network sensitivity to TransciptionFactors (FCONC)
+    // ComputeGenesCUDA(); // NB (i)Epigenetic countdown, (ii) GRN gene regulatory network sensitivity to TransciptionFactors (FCONC)
      cuCheck(cuCtxSynchronize(), "Run", "cuCtxSynchronize", "After ComputeGenesCUDA", mbDebug);
 //     if(m_FParams.debug>1)std::cout<<"\n####\nRun2GeneAction()end";
      if(launchParams.debug>0){

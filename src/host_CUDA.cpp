@@ -630,12 +630,12 @@ void FluidSystem::InitializeBondsCUDA (){
 
 void FluidSystem::ComputePressureCUDA (){
     void* args[1] = { &mActivePoints };
-    //cout<<"\nComputePressureCUDA: mActivePoints="<<mActivePoints<<std::flush;
+    cout<<"\nComputePressureCUDA: mActivePoints="<<mActivePoints<<std::flush;
     cuCheck ( cuLaunchKernel ( m_Func[FUNC_COMPUTE_PRESS],  m_FParams.numBlocks, 1, 1, m_FParams.numThreads, 1, 1, 0, NULL, args, NULL), "ComputePressureCUDA", "cuLaunch", "FUNC_COMPUTE_PRESS", mbDebug);
 }
 
 void FluidSystem::ComputeDiffusionCUDA(){
-    //if (m_FParams.debug>1) std::cout << "\n\nRunning ComputeDiffusionCUDA()" << std::endl;
+    if (m_FParams.debug>1) std::cout << "\n\nRunning ComputeDiffusionCUDA()" << std::endl;
     void* args[1] = { &mActivePoints };
     cuCheck ( cuLaunchKernel ( m_Func[FUNC_COMPUTE_DIFFUSION],  m_FParams.numBlocks, 1, 1, m_FParams.numThreads, 1, 1, 0, NULL, args, NULL), "ComputeDiffusionCUDA", "cuLaunch", "FUNC_COMPUTE_DIFFUSION", mbDebug);
 }

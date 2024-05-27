@@ -102,7 +102,7 @@ int main ( int argc, const char** argv )
 
  
     std::string paramsPath("demo/SimParams.txt");     // Set file paths relative to data/ , where SpecfileBatchGenerator will be run.
-    std::string pointsPath("demo");
+    std::string pointsPath("demo/particles_pos_vel_color100001.csv");
     std::string genomePath("demo/genome.csv");
     std::string outPath("out");
     for(int i=0;i<paramsPath.length();i++)fluid.launchParams.paramsPath[i] = paramsPath[i];

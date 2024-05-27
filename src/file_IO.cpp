@@ -803,7 +803,7 @@ if (m_FParams.debug>1) std::cout<<"\n ReadPointsCSV2() line 1254: scanf result="
 if (m_FParams.debug>1) std::cout<<"\n\n ReadPointsCSV2() starting loop: number_of_lines="<<number_of_lines<<"\n"<<std::flush;
     ////////////////////
     int i, index, ret;
-    for (i=1; i<number_of_lines; i++ ) {
+    for (i=2; i<number_of_lines; i++ ) {
         // transcribe particle data from file to Pos, Vel and Clr
         ret=0;
         ret += std::fscanf(points_file, "%u,,%f,%f,%f,\t%f,%f,%f,\t %u, %u,, \t",&index, &Pos.x, &Pos.y, &Pos.z, &Vel.x, &Vel.y, &Vel.z, &Age, &Clr );

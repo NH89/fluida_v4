@@ -26,6 +26,7 @@
 	#include <cuda.h>
 	#include <curand.h>
     #include <string.h>
+    #include <cmath>
     #include "vector.h"
     #include "masks.h"
 //#include <../cuda-11.2/targets/x86_64-linux/include/curand_kernel.h>

@@ -3091,7 +3091,7 @@ extern "C" __global__ void weaken_tissue ( int ActivePoints, int list_length, in
 #define DIFFUSE_RATE 10.0   // - replace with: FGenome->difusability[NUM_GENES][2] (above)
 
 //! loops over all the chemicals in the given particle and exchanges chemicals
-extern "C" __device__ void contributeDiffusion(uint i, float3 p, int cell, const float currentConc[NUM_TF], float newConc[NUM_TF], uint diffusability[NUM_TF]){  
+extern "C" __device__ void contributeDiffusion(uint i, float3 p, int cell, const float currentConc[NUM_TF], float newConc[NUM_TF], uint diffusability[NUM_TF]){
     // if the cell is empty, skip it
     if (fbuf.bufI(FGRIDCNT)[cell] == 0) return;
 
@@ -3101,6 +3101,8 @@ extern "C" __device__ void contributeDiffusion(uint i, float3 p, int cell, const
 
     // offset of particle in particle list, and number of particles in cell?
     int clast = fbuf.bufI(FGRIDOFF)[cell] + fbuf.bufI(FGRIDCNT)[cell];
+
+    //for (int j = 0; j < NUM_TF; j++) newConc[j] = currentConc[j]; // initialize, then modify below.// Rather do this in computeDiffusion(..)
 
     // iterate over particles in cell
     for (int cndx = fbuf.bufI(FGRIDOFF)[cell]; cndx < clast; cndx++) {
@@ -3119,9 +3121,16 @@ extern "C" __device__ void contributeDiffusion(uint i, float3 p, int cell, const
             // for each chemical in this neighbour particle, exchange an amount relative to the diffusion rate with us
             // get the j'th chemical from this particle and exchange
             #pragma unroll
-            for (int j = 0; j < NUM_TF; j++) 
-                if(diffusability[j]) newConc[j] += diffusability[j] * c * (fbuf.bufF(FCONC)[pndx * NUM_TF + j] - currentConc[j]);
-        }
+            for (int j = 0; j < NUM_TF; j++)
+                if(diffusability[j]){
+                    newConc[j] += float(diffusability[j])/10.0f * c * (fbuf.bufF(FCONC)[pndx + fparam.maxPoints * j] - currentConc[j]);
+
+                    float add = diffusability[j] * c * (fbuf.bufF(FCONC)[pndx + fparam.maxPoints * j] - currentConc[j]);
+
+                    if(j==15)printf("\ncontributeDiffusion() i=%u, pndx=%u, j=%u, cell=%u, cndx=%u, dsq=%f, c=%f, diffusability[j]=%u/10, fbuf.bufF(FCONC)[pndx + fparam.maxPoints * j]=%f, currentConc[j]=%f, add=%f, newConc[j]=%f ",
+                           i, pndx, j, cell, cndx, dsq, c, diffusability[j], fbuf.bufF(FCONC)[pndx + fparam.maxPoints * j], currentConc[j], add, newConc[j]  );
+                }
+        }else{printf("\ncontributeDiffusion() i=%u, pndx=%u, cell=%u, cndx=%u, dsq=%f,",i, pndx, cell, cndx, dsq);}
     }
     // method:
     // add to ourselves 1% of what they have, and give away 1% of what we have
@@ -3146,7 +3155,7 @@ extern "C" __global__ void computeDiffusion(int pnum){
     float currentConc[NUM_TF] = {0};
     // TODO maybe memcpy?
     for (int j = 0; j < NUM_TF; j++){
-        currentConc[j] = fbuf.bufF(FCONC)[i * NUM_TF + j];
+        currentConc[j] = fbuf.bufF(FCONC)[i + fparam.maxPoints * j];
     }
     uint diffusability[NUM_TF];
     for (int j = 0; j < NUM_TF; j++) diffusability[j]=fgenome.tf_diffusability[j];
@@ -3166,9 +3175,12 @@ extern "C" __global__ void computeDiffusion(int pnum){
     __syncthreads();
 
     // for this particular particle, loop over chemicals and write to global memory
-    // TODO could also be memcpy
+    // TODO could also be memcpy  ... may need to write to ftemp.bufF(FCONC)  to avoid races.
     for (int j = 0; j < NUM_TF; j++){
-        fbuf.bufF(FCONC)[i * NUM_TF + j] = fgenome.tf_breakdown_rate[j] * (currentConc[j] + newConc[j]);
+        fbuf.bufF(FCONC)[i + fparam.maxPoints * j]  = (1 - 0.01* fgenome.tf_breakdown_rate[j]) * (currentConc[j] + newConc[j]); //
+
+        if(j==15)printf("\ncontributeDiffusion() i=%u,  breakdown_rate=%u,  currentConc[j]=%f,  newConc[j]=%f, conc_after_breakdown=%f ",
+            i, fgenome.tf_breakdown_rate[j], currentConc[j], newConc[j], fbuf.bufF(FCONC)[i + fparam.maxPoints * j]  );
     }
 }
 
