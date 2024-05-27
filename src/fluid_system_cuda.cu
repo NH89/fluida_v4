@@ -696,11 +696,11 @@ extern "C" __global__ void computeGeneAction ( int pnum, int gene, uint list_len
     if ( i >= list_len ) return;
     uint particle_index = fbuf.bufII(FDENSE_LISTS)[gene][i];
     uint particle_ID    = fbuf.bufI(FPARTICLE_ID)[particle_index];
-                                                                                                            //if (particle_index <= pnum  &&  particle_index%100==0){
-                                                                                                            //    printf("\ncomputeGeneAction: (particle_index >= pnum),  gene=%u, i=%u, list_len=%u, particle_index=%u, pnum=%u .\t",  gene, i, list_len, particle_index, pnum);
-                                                                                                            //}
+                                                                                                            if (particle_index <= pnum  &&  particle_index%100==0){
+                                                                                                                printf("\ncomputeGeneAction()_1   (particle_index >= pnum),  gene=%u, i=%u, list_len=%u, particle_index=%u, pnum=%u .\t",  gene, i, list_len, particle_index, pnum);
+                                                                                                            }
     int delay = (int)fbuf.bufI(FEPIGEN)[gene*fparam.maxPoints + particle_index];                                // Change in _epigenetic_ activation of this particle
-                                                                                                            //if (particle_index <= pnum  &&  particle_index%100==0) printf("\nDelay=%i, particle_index=%u\t", delay, particle_index);
+                                                                                                            if (particle_index <= pnum  &&  particle_index%100==0) printf("\ncomputeGeneAction()_2   Delay=%i, particle_index=%u\t", delay, particle_index);
 
     if (0 < delay && delay < INT_MAX){                                                                          // (FEPIGEN==INT_MAX) => active & not counting down.
         fbuf.bufI(FEPIGEN)[gene*fparam.maxPoints + particle_index]--;                                           // (FEPIGEN<1) => inactivated @ insertParticles(..)
@@ -711,7 +711,7 @@ extern "C" __global__ void computeGeneAction ( int pnum, int gene, uint list_len
     #pragma unroll                                                                                  // speed up by eliminating loop logic.
     for(int j=0;j<NUM_GENES;j++) sensitivity[j]= fgenome.sensitivity[gene][j];                      // for each gene, its sensitivity to each TF or morphogen
 
-                                                                                                            if(i==list_len-1) printf("\ncomputeGeneAction Chk : gene=%u, i=%u, list_len=%u, particle_index=%u, pnum=%u ,  sensitivity[15]=%u.\t",
+                                                                                                            if(i==list_len-1) printf("\ncomputeGeneAction()_3   gene=%u, i=%u, list_len=%u, particle_index=%u, pnum=%u ,  sensitivity[15]=%u.\t",
                                                                                                             gene, i, list_len, particle_index, pnum, sensitivity[15]);                               // debug chk
 
 
@@ -722,7 +722,7 @@ extern "C" __global__ void computeGeneAction ( int pnum, int gene, uint list_len
             activity +=  sensitivity[tf] * fbuf.bufF(FCONC)[particle_index + fparam.maxPoints*tf];
         }
                                                                                                             if (sensitivity[tf] * fbuf.bufF(FCONC)[particle_index + fparam.maxPoints*tf] !=0) {
-                                                                                                                printf("\nID=%i, particle=i=%i, tf=%i, sensitivity[tf]=%i, fbuf.bufF(FCONC)[]=%f, activity=%f    ",
+                                                                                                                printf("\ncomputeGeneAction()_4  ID=%i, particle=i=%i, tf=%i, sensitivity[tf]=%i, fbuf.bufF(FCONC)[]=%f, activity=%f    ",
                                                                                                                        particle_ID, i , tf, sensitivity[tf], fbuf.bufF(FCONC)[particle_index + fparam.maxPoints*tf], activity  );
                                                                                                             }
     }
@@ -737,7 +737,7 @@ extern "C" __global__ void computeGeneAction ( int pnum, int gene, uint list_len
         atomicAdd( &ftemp.bufF(FCONC)[particle_index + fparam.maxPoints*tf ], secretion_rate*activity);  // *NUM_TF     // NB writing to ftemp, but rea from fbuf, so _should_ be no race condition.
         //ftemp.bufI(FCONC)[particle_index*NUM_TF +tf] += secretion_rate*activity;
                                                                                                             if (activity*secretion_rate!=0) {
-                                                                                                                printf("\nID=%i, particle=i=%i TF=j=%i, tf=%i, secretion_rate=%i, activity=%f\t  secretion_rate*activity=%f",
+                                                                                                                printf("\ncomputeGeneAction()_5  ID=%i, particle=i=%i TF=j=%i, tf=%i, secretion_rate=%i, activity=%f\t  secretion_rate*activity=%f",
                                                                                                                        particle_ID, i, j, tf, secretion_rate, activity, secretion_rate*activity);
                                                                                                             }
     }
@@ -745,11 +745,11 @@ extern "C" __global__ void computeGeneAction ( int pnum, int gene, uint list_len
     for (int j=0;j<numLRNA;j++){
         int other_gene = fgenome.activate[gene][j*2];
         int threshold = fgenome.activate[gene][j*2 + 1];
-        if(threshold<activity)                                                                      // NB atomicAdd required because gene lists differ, so two threads _may_ try to write to the same gene.
-        atomicAdd( &ftemp.bufI(FEPIGEN)[other_gene*fparam.maxPoints + particle_index], 1);          // what should be the initial state of other_gene when activated ?
+        if(threshold<activity)  {                                                                    // NB atomicAdd required because gene lists differ, so two threads _may_ try to write to the same gene.
+            atomicAdd( &ftemp.bufI(FEPIGEN)[other_gene*fparam.maxPoints + particle_index], 1); }         // what should be the initial state of other_gene when activated ?
         //ftemp.bufI(FEPIGEN)[other_gene*fparam.maxPoints + particle_index] += 1;                     // NB writing to ftemp, but rea from fbuf, so _should_ be no race condition.
                                                                                                             if (threshold<activity) {
-                                                                                                                printf("\nID=%i, particle=i=%i, gene=%i, threshold=%i, activity=%f    ",
+                                                                                                                printf("\ncomputeGeneAction()_6  ID=%i, particle=i=%i, gene=%i, threshold=%i, activity=%f    ",
                                                                                                                        particle_ID, i , gene, threshold, activity  );
                                                                                                             }
     }
